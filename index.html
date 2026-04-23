@@ -1,0 +1,1129 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Adaptive AI Learning – Onboarding</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script crossorigin src="https://unpkg.com/react@18/umd/react.development.js"></script>
+  <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+    * { font-family: 'Inter', sans-serif; }
+
+    .canvas-glow {
+      box-shadow:
+        0 0 0 1px rgba(0,0,0,0.06),
+        0 4px 6px -1px rgba(0,0,0,0.04),
+        0 10px 30px -5px rgba(0,0,0,0.08);
+    }
+
+    .top-gradient {
+      background:
+        radial-gradient(ellipse 55% 55% at 30% 0%,
+          rgba(108, 82, 229, 0.82) 0%,
+          rgba(108, 82, 229, 0.0) 70%
+        ),
+        radial-gradient(ellipse 55% 55% at 72% 0%,
+          rgba(80, 180, 230, 0.72) 0%,
+          rgba(80, 180, 230, 0.0) 70%
+        );
+    }
+
+    .input-bar {
+      box-shadow: 0 1px 4px rgba(0,0,0,0.08), 0 0 0 1px rgba(0,0,0,0.07);
+    }
+
+    .skip-btn {
+      box-shadow: 0 1px 3px rgba(0,0,0,0.06), 0 0 0 1px rgba(0,0,0,0.10);
+    }
+
+    textarea:focus { outline: none; }
+
+    @keyframes bounce {
+      0%, 80%, 100% { transform: translateY(0); opacity: 0.4; }
+      40%            { transform: translateY(-5px); opacity: 1; }
+    }
+
+    @keyframes spin { to { transform: rotate(360deg); } }
+    @keyframes pulse-ring {
+      0%   { transform: scale(0.8); opacity: 0.8; }
+      100% { transform: scale(1.6); opacity: 0; }
+    }
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(8px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+    .fade-in { animation: fadeIn 0.4s ease forwards; }
+    .spin { animation: spin 1s linear infinite; }
+
+    .sidebar {
+      transition: width 0.25s cubic-bezier(0.4,0,0.2,1);
+      overflow: hidden;
+    }
+    .sidebar-label {
+      transition: opacity 0.15s ease, transform 0.2s ease;
+    }
+    .sidebar-collapsed .sidebar-label {
+      opacity: 0;
+      pointer-events: none;
+      transform: translateX(-6px);
+    }
+    .sidebar-expanded .sidebar-label {
+      opacity: 1;
+      transform: translateX(0);
+    }
+    .nav-item {
+      transition: background 0.15s ease;
+    }
+    .nav-item:hover { background: rgba(0,0,0,0.05); }
+    .nav-item.active { background: rgba(99,102,241,0.08); color: #4f46e5; }
+  </style>
+</head>
+<body class="bg-gray-100 min-h-screen">
+<div id="root"></div>
+
+<script type="text/babel">
+const { useState, useRef, useEffect } = React;
+
+/* ── SVG icon helpers ── */
+const Icon = ({ d, size = 18, strokeWidth = 1.7, className = "", fill = "none", stroke = "currentColor" }) => (
+  <svg width={size} height={size} viewBox="0 0 24 24" fill={fill} stroke={stroke}
+    strokeWidth={strokeWidth} strokeLinecap="round" strokeLinejoin="round" className={className}>
+    <path d={d} />
+  </svg>
+);
+
+const CourseraLogo = () => (
+  <svg width="110" height="22" viewBox="0 0 110 22" fill="none">
+    <text x="0" y="17" fontFamily="Inter,sans-serif" fontWeight="700" fontSize="17" fill="#0056D2" letterSpacing="-0.3">coursera</text>
+  </svg>
+);
+
+const GoogleLogo = () => (
+  <svg width="52" height="18" viewBox="0 0 52 18" fill="none">
+    <text x="0" y="14" fontFamily="Inter,sans-serif" fontWeight="500" fontSize="14" fill="#5F6368" letterSpacing="-0.2">Google</text>
+  </svg>
+);
+
+/* ── Top Nav ── */
+const TopNav = ({ courseMode }) => (
+  <header className="flex items-center justify-between px-5 py-3 bg-white border-b border-gray-100 shrink-0">
+    <div className="flex items-center gap-3">
+      <CourseraLogo />
+      <span className="text-gray-300 text-lg font-light">|</span>
+      <GoogleLogo />
+    </div>
+    <div className="flex items-center gap-1">
+      <button className="w-8 h-8 flex items-center justify-center rounded-full hover:bg-gray-100 text-gray-500 transition-colors">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+          <circle cx="12" cy="12" r="10"/>
+          <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/>
+          <circle cx="12" cy="17" r=".5" fill="currentColor"/>
+        </svg>
+      </button>
+      <button className="w-8 h-8 flex items-center justify-center rounded-full hover:bg-gray-100 text-gray-500 transition-colors">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+          <circle cx="12" cy="12" r="10"/>
+          <path d="M2 12h20M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/>
+        </svg>
+      </button>
+      {/* AI sparkle icon — filled gradient in course mode */}
+      <button className="w-8 h-8 flex items-center justify-center rounded-full hover:bg-gray-100 transition-colors">
+        {courseMode ? (
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
+            <defs>
+              <linearGradient id="sparkleGrad" x1="0" y1="0" x2="1" y2="1">
+                <stop offset="0%" stopColor="#6366f1"/>
+                <stop offset="100%" stopColor="#06b6d4"/>
+              </linearGradient>
+            </defs>
+            <path d="M12 2 L13.8 9 L21 9 L15.2 13.5 L17.4 21 L12 16.5 L6.6 21 L8.8 13.5 L3 9 L10.2 9 Z"
+              fill="url(#sparkleGrad)"/>
+          </svg>
+        ) : (
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+            <path d="M12 2l2.4 7.4H22l-6.2 4.5 2.4 7.4L12 17l-6.2 4.3 2.4-7.4L2 9.4h7.6z"/>
+          </svg>
+        )}
+      </button>
+      <button className="w-8 h-8 flex items-center justify-center rounded-full bg-indigo-600 text-white text-sm font-semibold ml-1">N</button>
+    </div>
+  </header>
+);
+
+/* ── Isometric illustration (SVG) ── */
+const IsometricIllustration = () => (
+  <svg viewBox="0 0 160 130" fill="none" xmlns="http://www.w3.org/2000/svg" className="w-full max-w-[160px]">
+    {/* Base platform */}
+    <ellipse cx="80" cy="108" rx="54" ry="14" fill="#C4B5FD" opacity="0.35"/>
+    {/* Platform top face */}
+    <path d="M30 100 L80 115 L130 100 L80 85 Z" fill="#A78BFA"/>
+    {/* Platform left face */}
+    <path d="M30 100 L30 107 L80 122 L80 115 Z" fill="#7C3AED"/>
+    {/* Platform right face */}
+    <path d="M130 100 L130 107 L80 122 L80 115 Z" fill="#8B5CF6"/>
+
+    {/* Ground grass patches */}
+    <ellipse cx="55" cy="100" rx="8" ry="4" fill="#4ADE80" opacity="0.7"/>
+    <ellipse cx="108" cy="97" rx="6" ry="3" fill="#4ADE80" opacity="0.6"/>
+
+    {/* Building – main body left face */}
+    <path d="M62 58 L62 90 L80 98 L80 66 Z" fill="#F59E0B"/>
+    {/* Building – main body right face */}
+    <path d="M98 58 L98 90 L80 98 L80 66 Z" fill="#D97706"/>
+    {/* Building – main body top face */}
+    <path d="M62 58 L80 66 L98 58 L80 50 Z" fill="#FCD34D"/>
+
+    {/* Arch door */}
+    <path d="M74 90 Q80 82 86 90 L86 98 L74 98 Z" fill="#1E1B4B" opacity="0.75"/>
+
+    {/* Left tree trunk */}
+    <rect x="44" y="76" width="4" height="14" rx="1" fill="#92400E"/>
+    {/* Left tree canopy */}
+    <ellipse cx="46" cy="72" rx="9" ry="10" fill="#16A34A"/>
+    <ellipse cx="46" cy="68" rx="6" ry="7" fill="#22C55E"/>
+
+    {/* Right tree trunk */}
+    <rect x="112" y="74" width="4" height="14" rx="1" fill="#92400E"/>
+    {/* Right tree canopy */}
+    <ellipse cx="114" cy="70" rx="8" ry="9" fill="#15803D"/>
+    <ellipse cx="114" cy="66" rx="5" ry="6" fill="#22C55E"/>
+  </svg>
+);
+
+/* ── Panel toggle icon ── */
+const PanelIcon = () => (
+  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+    <rect x="3" y="3" width="18" height="18" rx="2"/>
+    <path d="M9 3v18"/>
+  </svg>
+);
+
+/* ── Sidebar ── */
+const Sidebar = ({ open, onToggle, courseMode, planDuration = "60min" }) => (
+  <aside
+    className="sidebar bg-white border-r border-gray-100 flex flex-col shrink-0 overflow-hidden"
+    style={{ width: open ? 300 : 40 }}
+  >
+    {/* Collapsed: just the toggle button */}
+    {!open && (
+      <div className="flex items-center justify-center pt-3">
+        <button
+          onClick={onToggle}
+          className="w-7 h-7 flex items-center justify-center rounded hover:bg-gray-100 text-gray-400 transition-colors"
+          title="Expand sidebar"
+        >
+          <PanelIcon />
+        </button>
+      </div>
+    )}
+
+    {/* Expanded panel */}
+    {open && (
+      <div className="flex flex-col h-full overflow-hidden">
+        {/* Header row */}
+        <div className="flex items-start justify-between px-4 pt-4 pb-2 shrink-0">
+          <div className="flex-1 pr-2">
+            <p className="text-sm font-semibold text-gray-900 leading-snug">
+              SQL for Data Science (and Version Control with GitHub)
+            </p>
+            <a href="#" className="text-xs text-indigo-600 hover:underline mt-1 inline-block">
+              Course progress
+            </a>
+          </div>
+          <button onClick={onToggle}
+            className="w-7 h-7 flex items-center justify-center rounded hover:bg-gray-100 text-gray-400 transition-colors shrink-0 mt-0.5">
+            <PanelIcon />
+          </button>
+        </div>
+
+        {courseMode ? (
+          /* ── Course mode sidebar content ── */
+          <div className="flex-1 overflow-y-auto">
+            {/* Today's plan mini card */}
+            {(() => {
+              const c = (typeof PLAN_CONTENT !== "undefined" && PLAN_CONTENT[planDuration]) || PLAN_CONTENT["60min"];
+              return (
+                <div className="mx-3 mb-3 rounded-xl border border-gray-200 bg-gray-50 overflow-hidden">
+                  <div className="flex items-start justify-between px-3 pt-3 pb-3">
+                    <div className="flex-1">
+                      <div className="flex items-center gap-1.5 text-xs text-gray-500 mb-1">
+                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                          <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>
+                        </svg>
+                        <span>Today's plan</span>
+                        <span>•</span>
+                        <span>{planDuration}</span>
+                      </div>
+                      <p className="text-xs text-gray-700 leading-snug">{c.sidebarDesc}</p>
+                    </div>
+                    <div className="shrink-0 ml-2 mt-0.5 w-12">
+                      <IsometricIllustration />
+                    </div>
+                  </div>
+                </div>
+              );
+            })()}
+
+            {/* Course items list */}
+            <div className="px-3 space-y-0.5">
+              {(PLAN_CONTENT[planDuration] || PLAN_CONTENT["60min"]).items.map((item, i) => (
+                <div key={i} className="flex items-start gap-2.5 py-2.5 px-1 hover:bg-gray-50 rounded-lg cursor-pointer">
+                  <div className="mt-0.5 shrink-0">
+                    {item.done ? (
+                      <div className="w-5 h-5 rounded-full bg-green-500 flex items-center justify-center">
+                        <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
+                          <polyline points="20 6 9 17 4 12"/>
+                        </svg>
+                      </div>
+                    ) : (
+                      <div className="w-5 h-5 rounded-full border-2 border-gray-300 bg-white" />
+                    )}
+                  </div>
+                  <div>
+                    <p className="text-xs font-medium text-gray-800 leading-snug">{item.title}</p>
+                    <p className="text-xs text-gray-400 mt-0.5">{item.type} • 6min</p>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        ) : (
+          /* ── Onboarding sidebar content ── */
+          <div className="flex-1 flex flex-col items-center justify-center px-6 pt-2 pb-16">
+            <IsometricIllustration />
+            <p className="text-xs text-gray-900 text-center leading-snug mt-5">
+              We would personalize your today's plan based on your skill level and time
+            </p>
+          </div>
+        )}
+      </div>
+    )}
+  </aside>
+);
+
+/* ── Feedback icons row ── */
+const FeedbackRow = ({ noMargin = false }) => {
+  const [liked, setLiked] = useState(null);
+  const [copied, setCopied] = useState(false);
+
+  const handleCopy = () => {
+    setCopied(true);
+    setTimeout(() => setCopied(false), 1500);
+  };
+
+  return (
+    <div className={`flex items-center gap-1 ${noMargin ? "" : "mt-4"}`}>
+      <button
+        onClick={() => setLiked(liked === "up" ? null : "up")}
+        className={`w-8 h-8 flex items-center justify-center rounded-full transition-colors
+          ${liked === "up" ? "bg-indigo-50 text-indigo-600" : "hover:bg-gray-100 text-gray-400"}`}
+        title="Helpful"
+      >
+        <svg width="16" height="16" viewBox="0 0 24 24" fill={liked === "up" ? "currentColor" : "none"}
+          stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+          <path d="M14 9V5a3 3 0 0 0-3-3l-4 9v11h11.28a2 2 0 0 0 2-1.7l1.38-9a2 2 0 0 0-2-2.3H14z"/>
+          <path d="M7 22H4a2 2 0 0 1-2-2v-7a2 2 0 0 1 2-2h3"/>
+        </svg>
+      </button>
+      <button
+        onClick={() => setLiked(liked === "down" ? null : "down")}
+        className={`w-8 h-8 flex items-center justify-center rounded-full transition-colors
+          ${liked === "down" ? "bg-red-50 text-red-500" : "hover:bg-gray-100 text-gray-400"}`}
+        title="Not helpful"
+      >
+        <svg width="16" height="16" viewBox="0 0 24 24" fill={liked === "down" ? "currentColor" : "none"}
+          stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+          <path d="M10 15v4a3 3 0 0 0 3 3l4-9V2H5.72a2 2 0 0 0-2 1.7l-1.38 9a2 2 0 0 0 2 2.3H10z"/>
+          <path d="M17 2h2.67A2.31 2.31 0 0 1 22 4v7a2.31 2.31 0 0 1-2.33 2H17"/>
+        </svg>
+      </button>
+      <button
+        onClick={handleCopy}
+        className={`w-8 h-8 flex items-center justify-center rounded-full transition-colors
+          ${copied ? "bg-green-50 text-green-600" : "hover:bg-gray-100 text-gray-400"}`}
+        title="Copy"
+      >
+        {copied ? (
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <polyline points="20 6 9 17 4 12"/>
+          </svg>
+        ) : (
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+            <rect x="9" y="9" width="13" height="13" rx="2"/>
+            <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/>
+          </svg>
+        )}
+      </button>
+    </div>
+  );
+};
+
+/* ── Chat Input Bar ── */
+const ChatInput = ({ onSend, placeholder = "Ask me anything" }) => {
+  const [value, setValue] = useState("");
+  const textareaRef = useRef(null);
+
+  useEffect(() => {
+    const ta = textareaRef.current;
+    if (!ta) return;
+    ta.style.height = "auto";
+    ta.style.height = Math.min(ta.scrollHeight, 120) + "px";
+  }, [value]);
+
+  const handleKeyDown = (e) => {
+    if (e.key === "Enter" && !e.shiftKey) {
+      e.preventDefault();
+      if (value.trim()) { onSend(value); setValue(""); }
+    }
+  };
+
+  return (
+    <div className="input-bar flex items-center gap-2 bg-white rounded-full px-4 py-2.5">
+      <button className="w-7 h-7 flex items-center justify-center rounded-full hover:bg-gray-100 text-gray-400 shrink-0 transition-colors">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+          <line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/>
+        </svg>
+      </button>
+      <textarea
+        ref={textareaRef}
+        rows={1}
+        value={value}
+        onChange={e => setValue(e.target.value)}
+        onKeyDown={handleKeyDown}
+        placeholder={placeholder}
+        className="flex-1 resize-none bg-transparent text-sm text-gray-700 placeholder-gray-400 leading-relaxed py-0.5"
+        style={{ maxHeight: 120, overflowY: "auto" }}
+      />
+      <div className="flex items-center gap-2 shrink-0">
+        <button className="w-7 h-7 flex items-center justify-center rounded-full hover:bg-gray-100 text-gray-400 transition-colors">
+          <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+            <path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/>
+            <path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="23"/>
+            <line x1="8" y1="23" x2="16" y2="23"/>
+          </svg>
+        </button>
+        <button
+          onClick={() => { if (value.trim()) { onSend(value); setValue(""); } }}
+          className={`w-8 h-8 flex items-center justify-center rounded-full transition-all
+            ${value.trim() ? "bg-indigo-600 hover:bg-indigo-700 text-white shadow-sm" : "bg-indigo-500 text-white"}`}
+        >
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+            <line x1="12" y1="19" x2="12" y2="5"/><polyline points="5 12 12 5 19 12"/>
+          </svg>
+        </button>
+      </div>
+    </div>
+  );
+};
+
+/* ── Edit icon ── */
+const EditIcon = () => (
+  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+    <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/>
+    <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/>
+  </svg>
+);
+
+/* ── Question bank ── */
+const QUESTIONS = [
+  {
+    intro: "Copy that! Since you've already handled simple queries, I've prepared a fast-track for you. Just to make sure we don't skip anything vital, we want to understand your comfort level with basic data retrieval.\n\nQuerying & Filtering Foundations:",
+    bold: "Can you Write a SELECT statement and filter results with WHERE?",
+    choices: [
+      "I'm still figuring out the basic syntax.",
+      "I can handle SELECT and WHERE, but a quick refresh wouldn't hurt.",
+      "I'm a pro at basics. Skip the intro and let's get to work.",
+    ],
+  },
+  {
+    intro: "Good to know! Let's check your comfort level with combining data across tables.\n\nJoins & Relationships:",
+    bold: "Have you worked with JOIN clauses to combine data from multiple tables?",
+    choices: [
+      "JOINs are new to me — I'd love a solid walkthrough.",
+      "I've used INNER JOIN before, but the others confuse me.",
+      "I'm comfortable with all JOIN types including LEFT, RIGHT, and FULL.",
+    ],
+  },
+];
+
+/* ── Shared ChoiceCard ── */
+const ChoiceCard = ({ choices, onSelect, onSkip }) => (
+  <div className="border border-gray-200 rounded-2xl overflow-hidden bg-white shadow-sm">
+    <div className="px-4 pt-3 pb-2 border-b border-gray-100">
+      <button
+        onClick={onSkip}
+        className="text-sm font-semibold text-indigo-600 hover:text-indigo-700 transition-colors"
+      >
+        Skip For Now
+      </button>
+    </div>
+    {choices.map((text, i) => (
+      <button
+        key={i}
+        onClick={() => onSelect(text)}
+        className="w-full flex items-center gap-3 px-4 py-3.5 text-left hover:bg-gray-50 transition-colors border-b border-gray-100 last:border-b-0 group"
+      >
+        <span className="w-5 h-5 rounded-full border border-gray-300 group-hover:border-indigo-400 flex items-center justify-center shrink-0 text-xs text-gray-400 group-hover:text-indigo-500 font-medium transition-colors">
+          {i + 1}
+        </span>
+        <span className="text-sm text-gray-700 leading-snug">{text}</span>
+      </button>
+    ))}
+  </div>
+);
+
+/* ── Skip-decision Card ── */
+const SkipDecisionCard = ({ onContinue, onStart }) => (
+  <div className="border border-gray-200 rounded-2xl overflow-hidden bg-white shadow-sm">
+    <div className="px-4 pt-3 pb-2 border-b border-gray-100">
+      <p className="text-sm font-semibold text-gray-800">What would you like to do?</p>
+    </div>
+    <button
+      onClick={onContinue}
+      className="w-full flex items-center gap-3 px-4 py-3.5 text-left hover:bg-gray-50 transition-colors border-b border-gray-100 group"
+    >
+      <span className="w-5 h-5 rounded-full border border-gray-300 group-hover:border-indigo-400 flex items-center justify-center shrink-0 text-xs text-gray-400 group-hover:text-indigo-500 font-medium transition-colors">1</span>
+      <span className="text-sm text-gray-700 leading-snug">Continue personalizing my learning path.</span>
+    </button>
+    <button
+      onClick={onStart}
+      className="w-full flex items-center gap-3 px-4 py-3.5 text-left hover:bg-gray-50 transition-colors group"
+    >
+      <span className="w-5 h-5 rounded-full border border-gray-300 group-hover:border-indigo-400 flex items-center justify-center shrink-0 text-xs text-gray-400 group-hover:text-indigo-500 font-medium transition-colors">2</span>
+      <span className="text-sm text-gray-700 leading-snug">Start the course now — I'll personalize as I go.</span>
+    </button>
+  </div>
+);
+
+/* ── Thinking dots ── */
+const ThinkingDots = () => (
+  <div className="flex items-center gap-1.5 py-1">
+    {[0,1,2].map(i => (
+      <span key={i} className="w-2 h-2 rounded-full bg-gray-300"
+        style={{ animation: `bounce 1.2s ease-in-out ${i * 0.2}s infinite` }} />
+    ))}
+  </div>
+);
+
+/* ── Plan card ── */
+const PLAN = [
+  {
+    title: "SQL Fundamentals",
+    badge: "⚡ Fast-tracked",
+    badgeColor: "text-yellow-600",
+    desc: "Since you know the basics, I've cleared the introductory noise. We'll start with Optimized Join Generation to jump straight into action.",
+  },
+  {
+    title: "Advanced Querying (like Joins & CTEs)",
+    badge: "🔍 Deep Dive",
+    badgeColor: "text-gray-600",
+    desc: "Since you know the basics, I've cleared the introductory noise. We'll start with Optimized Join Generation to jump straight into action.",
+  },
+  {
+    title: "Data Engineering with GitHub",
+    badge: "🎯 Goal-Aligned",
+    badgeColor: "text-red-500",
+    desc: "Your primary mission. I've injected more practices integration into the GitHub and Capstone modules.",
+  },
+];
+
+const PlanCard = ({ onAccept, onAdjust, disabled }) => (
+  <div className="border border-gray-200 rounded-2xl overflow-hidden bg-white shadow-sm">
+    <div className="px-5 pt-5 pb-4">
+      <h3 className="text-base font-bold text-gray-900 mb-4">Your personalized learning plan</h3>
+      <div className="space-y-5">
+        {PLAN.map((item, i) => (
+          <div key={i}>
+            <div className="flex items-start justify-between gap-2 mb-1">
+              <span className="text-sm font-semibold text-gray-900">{item.title}</span>
+              <span className={`text-xs font-medium whitespace-nowrap ${item.badgeColor}`}>{item.badge}</span>
+            </div>
+            <p className="text-sm text-gray-500 leading-relaxed">{item.desc}</p>
+          </div>
+        ))}
+      </div>
+    </div>
+    {!disabled && (
+      <div className="px-5 pb-5 flex items-center gap-4">
+        <button
+          onClick={onAccept}
+          className="flex items-center gap-1.5 px-4 py-2 rounded-lg border border-indigo-600 text-indigo-600 text-sm font-medium hover:bg-indigo-50 transition-colors"
+        >
+          Looks good <span>→</span>
+        </button>
+        <span className="text-sm text-gray-500">
+          Not quite right?{" "}
+          <button onClick={onAdjust} className="text-indigo-600 font-medium hover:underline">
+            Adjust plan
+          </button>
+        </span>
+      </div>
+    )}
+  </div>
+);
+
+/* ── Loading Screen ── */
+const LoadingScreen = () => {
+  const steps = [
+    "Analyzing your skill profile…",
+    "Mapping to course modules…",
+    "Building your daily plan…",
+  ];
+  const [activeStep, setActiveStep] = useState(0);
+  useEffect(() => {
+    const id = setInterval(() => setActiveStep(s => Math.min(s + 1, steps.length - 1)), 900);
+    return () => clearInterval(id);
+  }, []);
+  return (
+    <div className="flex-1 flex flex-col items-center justify-center bg-white gap-8">
+      {/* Spinner */}
+      <div className="relative w-16 h-16">
+        <div className="absolute inset-0 rounded-full border-4 border-gray-100" />
+        <div className="absolute inset-0 rounded-full border-4 border-indigo-500 border-t-transparent spin" />
+        <div className="absolute inset-2 rounded-full bg-indigo-50 flex items-center justify-center">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
+            <defs>
+              <linearGradient id="lg2" x1="0" y1="0" x2="1" y2="1">
+                <stop offset="0%" stopColor="#6366f1"/>
+                <stop offset="100%" stopColor="#06b6d4"/>
+              </linearGradient>
+            </defs>
+            <path d="M12 2 L13.8 9 L21 9 L15.2 13.5 L17.4 21 L12 16.5 L6.6 21 L8.8 13.5 L3 9 L10.2 9 Z" fill="url(#lg2)"/>
+          </svg>
+        </div>
+      </div>
+      {/* Steps */}
+      <div className="space-y-3 text-center">
+        {steps.map((s, i) => (
+          <p key={i} className={`text-sm transition-all duration-300 ${i <= activeStep ? "text-gray-800 font-medium" : "text-gray-300"}`}>
+            {i < activeStep ? "✓ " : ""}{s}
+          </p>
+        ))}
+      </div>
+    </div>
+  );
+};
+
+/* ── Per-duration content ── */
+const PLAN_CONTENT = {
+  "15min": {
+    skill: "SQL SELECT basics",
+    desc: "You've trimmed it down — smart move. We'll zero in on the essentials: reading tables and pulling exactly the data you need. No fluff, maximum impact.",
+    sidebarDesc: "Quick sprint: SELECT query fundamentals",
+    items: [
+      { title: "Welcome to SQL for data science", type: "Video", done: false },
+      { title: "Writing your first SELECT", type: "Reading", done: false },
+      { title: "Quick quiz: SELECT & FROM", type: "Quiz", done: false },
+    ],
+  },
+  "30min": {
+    skill: "SELECT + WHERE filtering",
+    desc: "Adjusted to 30 minutes — enough time to build real momentum. You'll write SELECT queries and start filtering data with WHERE, the two moves that unlock 80% of analytics work.",
+    sidebarDesc: "SELECT queries and WHERE filtering",
+    items: [
+      { title: "Welcome to SQL for data science", type: "Video", done: false },
+      { title: "Writing your first SELECT", type: "Reading", done: false },
+      { title: "Filtering with WHERE", type: "Reading", done: false },
+      { title: "Practice: filter real datasets", type: "Practice", done: false },
+    ],
+  },
+  "45min": {
+    skill: "Joins & multi-table queries",
+    desc: "45 minutes gives us real room to work. We'll push past the basics and into JOINs — the skill that separates analysts who query one table from those who query the whole database.",
+    sidebarDesc: "Joins and multi-table querying",
+    items: [
+      { title: "Welcome to SQL for data science", type: "Video", done: false },
+      { title: "Writing your first SELECT", type: "Reading", done: false },
+      { title: "Filtering with WHERE", type: "Reading", done: false },
+      { title: "INNER JOIN explained", type: "Reading", done: false },
+      { title: "LEFT vs RIGHT JOIN", type: "Reading", done: false },
+    ],
+  },
+  "60min": {
+    skill: "Prompt engineering basics",
+    desc: "Based on your recent work, it seems that you are less comfortable working with large data sets. It might help you to spend a bit of time learning this core skill before continuing in your path.",
+    sidebarDesc: "Diving deeper into databases and Jupyter Notebooks",
+    items: [
+      { title: "Welcome to SQL for data science", type: "Video", done: false },
+      { title: "Course item", type: "Reading", done: false },
+      { title: "Course item", type: "Reading", done: false },
+      { title: "Course item", type: "Reading", done: false },
+      { title: "Course item", type: "Reading", done: false },
+      { title: "Course item", type: "Reading", done: false },
+    ],
+  },
+};
+
+/* ── Today's Plan hero card ── */
+const TodaysPlanCard = ({ duration = "60min", hideStart = false }) => {
+  const content = PLAN_CONTENT[duration] || PLAN_CONTENT["60min"];
+  return (
+    <div className="border border-gray-200 rounded-2xl overflow-hidden bg-white shadow-sm fade-in">
+      {/* Hero banner */}
+      <div className="relative bg-gradient-to-br from-slate-100 to-blue-50 px-6 py-6 flex items-center justify-between overflow-hidden" style={{minHeight: 160}}>
+        <div className="z-10">
+          <span className="inline-block text-xs font-semibold text-gray-500 bg-white/70 rounded-full px-2.5 py-0.5 mb-3">{duration}</span>
+          <h2 className="text-2xl font-bold text-gray-900 mb-4">Welcome! Your today's plan</h2>
+          {!hideStart && (
+            <button className="bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-semibold px-5 py-2 rounded-lg transition-colors">
+              Start
+            </button>
+          )}
+        </div>
+        {/* Illustration */}
+        <svg viewBox="0 0 120 100" className="absolute right-4 bottom-0 w-28 opacity-80" fill="none">
+          <path d="M20 95 Q60 60 110 50" stroke="#CBD5E1" strokeWidth="3" strokeDasharray="6 4"/>
+          <path d="M30 98 Q65 65 110 58" stroke="#CBD5E1" strokeWidth="2" strokeDasharray="4 4"/>
+          <circle cx="72" cy="32" r="10" fill="#FCD34D"/>
+          <path d="M62 30 Q72 20 82 30" fill="#F59E0B"/>
+          <rect x="60" y="29" width="24" height="4" rx="2" fill="#F59E0B"/>
+          <path d="M65 42 Q72 38 79 42 L81 62 L63 62 Z" fill="#6366F1"/>
+          <line x1="65" y1="48" x2="57" y2="56" stroke="#6366F1" strokeWidth="3" strokeLinecap="round"/>
+          <line x1="79" y1="48" x2="87" y2="56" stroke="#6366F1" strokeWidth="3" strokeLinecap="round"/>
+          <line x1="67" y1="62" x2="64" y2="78" stroke="#374151" strokeWidth="3" strokeLinecap="round"/>
+          <line x1="77" y1="62" x2="80" y2="78" stroke="#374151" strokeWidth="3" strokeLinecap="round"/>
+        </svg>
+      </div>
+
+      {/* Skills you will learn */}
+      <div className="px-6 py-5">
+        <div className="flex gap-3">
+          <div className="mt-0.5 shrink-0 w-5 h-5 rounded-full bg-yellow-100 flex items-center justify-center">
+            <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="#D97706" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+              <circle cx="12" cy="12" r="5"/>
+              <line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/>
+              <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/>
+              <line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/>
+              <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/>
+            </svg>
+          </div>
+          <div>
+            <p className="text-xs font-semibold text-gray-400 uppercase tracking-wide mb-1">Skills you will learn</p>
+            <p className="text-sm font-semibold text-gray-900 mb-1">{content.skill}</p>
+            <p className="text-sm text-gray-700 leading-relaxed">{content.desc}</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+/*
+  stage:
+    "onboarding"      – initial screen
+    "question"        – AI asked a question, choice card visible
+    "skip-decide"     – user hit Skip For Now
+    "thinking"        – computing plan (1.5 s delay)
+    "plan"            – show personalized plan card
+    "adjust"          – user clicked Adjust plan, AI asked what's wrong
+    "adjust-thinking" – regenerating plan
+    "loading"         – 3s loading before course view
+    "course"          – course view with today's plan
+*/
+
+/* ── Main App ── */
+const App = () => {
+  const [stage, setStage] = useState("onboarding");
+  const [qIndex, setQIndex] = useState(0);
+  const [messages, setMessages] = useState([]);
+  const [sidebarOpen, setSidebarOpen] = useState(false);
+  const scrollRef = useRef(null);
+
+  useEffect(() => {
+    if (scrollRef.current) {
+      scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
+    }
+  }, [messages, stage]);
+
+  const addMsg = (role, text, extra = {}) =>
+    setMessages(prev => [...prev, { role, text, ...extra }]);
+
+  const askQuestion = (idx) => {
+    const q = QUESTIONS[idx];
+    addMsg("ai", q.intro, { bold: q.bold });
+    setQIndex(idx);
+    setStage("question");
+  };
+
+  const showPlan = () => {
+    setStage("thinking");
+    setTimeout(() => {
+      addMsg("ai",
+        "Personalization complete! 🚀\nBased on your background as a PM and your SQL baseline, I've prioritized professional GitHub workflows and AI-assisted coding while bypassing the foundations you've already mastered.",
+        { plan: true }
+      );
+      setStage("plan");
+    }, 1500);
+  };
+
+  const handleInitialSend = (text) => {
+    addMsg("user", text);
+    setTimeout(() => askQuestion(0), 400);
+  };
+
+  const handleAnswer = (text) => {
+    addMsg("user", text);
+    const next = qIndex + 1;
+    if (next < QUESTIONS.length) {
+      setTimeout(() => askQuestion(next), 400);
+    } else {
+      setTimeout(() => showPlan(), 400);
+    }
+  };
+
+  const handleSkip = () => {
+    addMsg("ai", "No problem! Would you like to continue personalizing your learning path, or jump straight into the course?");
+    setStage("skip-decide");
+  };
+
+  const handleAdjust = () => {
+    addMsg("ai", "Of course! What part of the plan doesn't feel right? Feel free to tell me what you'd like to change — more depth, different focus, or a different pace.");
+    setStage("adjust");
+  };
+
+  const handleAdjustAnswer = (text) => {
+    addMsg("user", text);
+    setStage("adjust-thinking");
+    setTimeout(() => {
+      addMsg("ai",
+        "Got it! I've updated your plan based on your feedback. Here's the revised version:",
+        { plan: true }
+      );
+      setStage("plan");
+    }, 1500);
+  };
+
+  const handleSkipDecision = (text) => {
+    addMsg("user", text);
+    if (text.startsWith("Continue")) {
+      const next = qIndex + 1;
+      if (next < QUESTIONS.length) {
+        setTimeout(() => askQuestion(next), 400);
+      } else {
+        setTimeout(() => showPlan(), 400);
+      }
+    } else {
+      setStage("done");
+    }
+  };
+
+  /* Looks good → loading → course */
+  const handleAcceptPlan = () => {
+    setStage("loading");
+    setTimeout(() => {
+      setSidebarOpen(true);
+      setStage("course");
+    }, 3000);
+  };
+
+  /* Adjust learning time button */
+  const handleAdjustTime = () => {
+    setCourseMessages(prev => [...prev, { role: "user", text: "I want to adjust my time" }]);
+    setTimeout(() => {
+      setCourseMessages(prev => [...prev, { role: "ai", text: "Sure! How long do you want to learn for today?" }]);
+      setCourseStage("time-pick");
+    }, 400);
+  };
+
+  /* Time option selected */
+  const handleTimePick = (text) => {
+    setCourseMessages(prev => [...prev, { role: "user", text }]);
+    const dur = text; // "15min" | "30min" | "45min"
+    setPrevDuration(planDuration);
+    setPlanDuration(dur);
+    setTimeout(() => {
+      setCourseMessages(prev => [...prev, {
+        role: "ai",
+        text: `Got it! I've updated your plan to ${dur}. Here's your adjusted session:`,
+        planCard: dur,
+      }]);
+      setCourseStage("course-chat");
+    }, 400);
+  };
+
+  /* Course-view local state */
+  const [courseMessages, setCourseMessages] = useState([]);
+  const [courseStage, setCourseStage] = useState("idle"); // idle | time-pick | course-chat
+  const [planDuration, setPlanDuration] = useState("60min");
+  const [prevDuration, setPrevDuration] = useState(null);
+  const courseScrollRef = useRef(null);
+
+  useEffect(() => {
+    if (courseScrollRef.current) {
+      courseScrollRef.current.scrollTop = courseScrollRef.current.scrollHeight;
+    }
+  }, [courseMessages, courseStage]);
+
+  const TIME_OPTIONS = ["15min", "30min", "45min"];
+
+  const isOnboarding = stage === "onboarding";
+  const isCourse = stage === "course";
+  const isLoading = stage === "loading";
+  const currentQ = QUESTIONS[qIndex];
+
+  return (
+    <div className="flex flex-col h-screen bg-gray-50 overflow-hidden">
+      <TopNav courseMode={isCourse} />
+      <div className="flex flex-1 overflow-hidden">
+        <Sidebar
+          open={sidebarOpen}
+          onToggle={() => setSidebarOpen(o => !o)}
+          courseMode={isCourse}
+          planDuration={planDuration}
+        />
+
+        {/* Main canvas */}
+        <main className="flex-1 flex flex-col overflow-hidden bg-white canvas-glow relative">
+
+          {/* Loading screen */}
+          {isLoading && <LoadingScreen />}
+
+          {/* Course view */}
+          {isCourse && (
+            <>
+              <div ref={courseScrollRef} className="flex-1 overflow-y-auto">
+                <div className="max-w-2xl mx-auto px-6 pt-8 pb-6 space-y-6">
+
+                  {/* Today's plan card — always shows original 60min */}
+                  <div>
+                    <TodaysPlanCard duration="60min" hideStart={prevDuration !== null} />
+                    <div className="flex items-center gap-2 mt-4">
+                      <FeedbackRow noMargin />
+                      {prevDuration && (
+                        <button
+                          onClick={() => {
+                            setPlanDuration(prevDuration);
+                            setPrevDuration(null);
+                            setCourseMessages(prev => prev.slice(0, -1));
+                          }}
+                          className="flex items-center gap-1.5 text-xs text-gray-500 hover:text-gray-800 border border-gray-200 hover:border-gray-400 rounded-full px-3 py-1.5 transition-colors ml-1"
+                        >
+                          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                            <path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/>
+                            <path d="M3 3v5h5"/>
+                          </svg>
+                          Revert to this plan
+                        </button>
+                      )}
+                    </div>
+                  </div>
+
+                  {/* Course conversation messages */}
+                  {courseMessages.map((m, i) => {
+                    if (m.role === "user") {
+                      return (
+                        <div key={i} className="flex justify-end">
+                          <div className="relative group max-w-sm">
+                            <div className="bg-gray-100 text-gray-700 text-sm rounded-2xl rounded-tr-sm px-4 py-2.5 leading-relaxed">
+                              {m.text}
+                            </div>
+                            <div className="absolute -bottom-5 right-0 flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                              <button className="w-6 h-6 flex items-center justify-center rounded text-gray-400 hover:text-gray-600">
+                                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+                                  <rect x="9" y="9" width="13" height="13" rx="2"/>
+                                  <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/>
+                                </svg>
+                              </button>
+                              <button className="w-6 h-6 flex items-center justify-center rounded text-gray-400 hover:text-gray-600">
+                                <EditIcon />
+                              </button>
+                            </div>
+                          </div>
+                        </div>
+                      );
+                    }
+                    const isLast = i === courseMessages.length - 1;
+                    return (
+                      <div key={i}>
+                        <p className="text-sm text-gray-700 leading-relaxed mb-3">{m.text}</p>
+                        {m.planCard && (
+                          <div className="mt-2">
+                            <TodaysPlanCard duration={m.planCard} />
+                          </div>
+                        )}
+                        {isLast && <FeedbackRow />}
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+
+              {/* Course bottom bar */}
+              <div className="z-10 px-6 pb-5 pt-2 bg-white border-t border-gray-100">
+                <div className="max-w-2xl mx-auto space-y-2.5">
+
+                  {/* Time picker card */}
+                  {courseStage === "time-pick" && (
+                    <div className="border border-gray-200 rounded-2xl overflow-hidden bg-white shadow-sm">
+                      {TIME_OPTIONS.map((opt, i) => (
+                        <button
+                          key={i}
+                          onClick={() => handleTimePick(opt)}
+                          className="w-full flex items-center gap-3 px-4 py-3.5 text-left hover:bg-gray-50 transition-colors border-b border-gray-100 last:border-b-0 group"
+                        >
+                          <span className="w-5 h-5 rounded-full border border-gray-300 group-hover:border-indigo-400 flex items-center justify-center shrink-0 text-xs text-gray-400 group-hover:text-indigo-500 font-medium transition-colors">
+                            {i + 1}
+                          </span>
+                          <span className="text-sm text-gray-700">{opt}</span>
+                        </button>
+                      ))}
+                    </div>
+                  )}
+
+                  {/* Adjust learning time button — only when idle */}
+                  {courseStage === "idle" && (
+                    <div className="flex justify-start">
+                      <button
+                        onClick={handleAdjustTime}
+                        className="skip-btn bg-white text-gray-600 text-sm rounded-full px-4 py-2 hover:bg-gray-50 transition-colors"
+                      >
+                        Adjust learning time
+                      </button>
+                    </div>
+                  )}
+
+                  <ChatInput
+                    onSend={(text) => {
+                      setCourseMessages(prev => [...prev, { role: "user", text }]);
+                      setCourseStage("course-chat");
+                    }}
+                    placeholder={courseStage === "idle" ? "Ask me anything" : "Answer in my own words"}
+                  />
+                </div>
+              </div>
+            </>
+          )}
+
+          {/* Onboarding + conversation view */}
+          {!isLoading && !isCourse && (
+            <>
+              {/* Top gradient — only on onboarding */}
+              {isOnboarding && (
+                <div className="top-gradient absolute inset-x-0 top-0 h-56 pointer-events-none z-0" />
+              )}
+
+              {/* Scrollable content */}
+              <div ref={scrollRef} className="flex-1 overflow-y-auto z-10 relative">
+                <div className="max-w-2xl mx-auto px-6 pb-6" style={{ paddingTop: isOnboarding ? "11rem" : "2rem" }}>
+
+                  {/* Onboarding message */}
+                  {isOnboarding && (
+                    <div className="space-y-4">
+                      <div>
+                        <h2 className="text-xl font-bold text-gray-900 leading-snug mb-2">
+                          Let's build your expert-level learning path.
+                        </h2>
+                        <p className="text-sm text-gray-500 leading-relaxed">
+                          Tell us a bit about your background, and we'll prune the noise to save you hours of redundant Learning.
+                        </p>
+                      </div>
+                      <div className="text-sm text-gray-700 leading-relaxed space-y-1">
+                        <p>This course is built around three major pillars:</p>
+                        <p>[1] SQL Fundamentals</p>
+                        <p>[2] Advanced Querying (like Joins &amp; CTEs)</p>
+                        <p>[3] Data Engineering with GitHub.</p>
+                      </div>
+                      <p className="text-sm text-gray-700 leading-relaxed">
+                        To personalize your journey, how would you{" "}
+                        <strong className="font-semibold text-gray-900">describe your overall comfort level with these areas</strong>
+                        ? Are you looking for{" "}
+                        <strong className="font-semibold text-gray-900">a full deep-dive, or should we skip to the advanced professional workflows</strong>
+                        ?
+                      </p>
+                      <FeedbackRow />
+                    </div>
+                  )}
+
+                  {/* Conversation thread */}
+                  {!isOnboarding && messages.map((m, i) => {
+                    if (m.role === "user") {
+                      return (
+                        <div key={i} className="flex justify-end mb-4">
+                          <div className="relative group max-w-sm">
+                            <div className="bg-indigo-100 text-gray-800 text-sm rounded-2xl rounded-tr-sm px-4 py-3 leading-relaxed">
+                              {m.text}
+                            </div>
+                            <div className="absolute -bottom-5 right-0 flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                              <button className="w-6 h-6 flex items-center justify-center rounded text-gray-400 hover:text-gray-600">
+                                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+                                  <rect x="9" y="9" width="13" height="13" rx="2"/>
+                                  <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/>
+                                </svg>
+                              </button>
+                              <button className="w-6 h-6 flex items-center justify-center rounded text-gray-400 hover:text-gray-600">
+                                <EditIcon />
+                              </button>
+                            </div>
+                          </div>
+                        </div>
+                      );
+                    }
+                    return (
+                      <div key={i} className="mb-6">
+                        <p className="text-sm text-gray-700 leading-relaxed whitespace-pre-line">
+                          {m.text}
+                          {m.bold && <><br /><strong className="font-semibold text-gray-900">{m.bold}</strong></>}
+                        </p>
+                        {m.plan && i === messages.length - 1 && stage === "plan" && (
+                          <div className="mt-4">
+                            <PlanCard onAccept={handleAcceptPlan} onAdjust={handleAdjust} />
+                          </div>
+                        )}
+                        {m.plan && !(i === messages.length - 1 && stage === "plan") && (
+                          <div className="mt-4"><PlanCard disabled /></div>
+                        )}
+                        {i === messages.length - 1 && m.role === "ai" && <FeedbackRow />}
+                      </div>
+                    );
+                  })}
+
+                  {/* Thinking dots */}
+                  {(stage === "thinking" || stage === "adjust-thinking") && (
+                    <div className="mb-4"><ThinkingDots /></div>
+                  )}
+                </div>
+              </div>
+
+              {/* Bottom bar */}
+              <div className="z-10 px-6 pb-5 pt-2 bg-white">
+                <div className="max-w-2xl mx-auto space-y-2.5">
+                  {isOnboarding && (
+                    <div className="flex justify-start">
+                      <button
+                        onClick={() => handleInitialSend("Skip personalization and start course for today")}
+                        className="skip-btn bg-white text-gray-600 text-sm rounded-full px-4 py-2 hover:bg-gray-50 transition-colors"
+                      >
+                        Skip personalization and start course for today
+                      </button>
+                    </div>
+                  )}
+                  {stage === "question" && (
+                    <ChoiceCard choices={currentQ.choices} onSelect={handleAnswer} onSkip={handleSkip} />
+                  )}
+                  {stage === "skip-decide" && (
+                    <SkipDecisionCard
+                      onContinue={() => handleSkipDecision("Continue personalizing my learning path.")}
+                      onStart={() => handleSkipDecision("Start the course now — I'll personalize as I go.")}
+                    />
+                  )}
+                  <ChatInput
+                    onSend={isOnboarding ? handleInitialSend : stage === "adjust" ? handleAdjustAnswer : handleAnswer}
+                    placeholder={isOnboarding ? "Ask me anything" : "Answer in my own words"}
+                  />
+                </div>
+              </div>
+            </>
+          )}
+        </main>
+      </div>
+    </div>
+  );
+};
+
+ReactDOM.createRoot(document.getElementById("root")).render(<App />);
+</script>
+</body>
+</html>
