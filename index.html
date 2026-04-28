@@ -284,7 +284,7 @@ const Sidebar = ({ open, onToggle, courseMode, planDuration = "60min" }) => (
                   </div>
                   <div>
                     <p className="text-xs font-medium text-gray-800 leading-snug">{item.title}</p>
-                    <p className="text-xs text-gray-400 mt-0.5">{item.type} • 6min</p>
+                    <p className="text-xs text-gray-400 mt-0.5">{item.type} • {item.duration || "6min"}</p>
                   </div>
                 </div>
               ))}
@@ -647,12 +647,12 @@ const PLAN_CONTENT = {
     desc: "Based on your recent work, it seems that you are less comfortable working with large data sets. It might help you to spend a bit of time learning this core skill before continuing in your path.",
     sidebarDesc: "Diving deeper into databases and Jupyter Notebooks",
     items: [
-      { title: "Welcome to SQL for data science", type: "Video", done: false },
-      { title: "Course item", type: "Reading", done: false },
-      { title: "Course item", type: "Reading", done: false },
-      { title: "Course item", type: "Reading", done: false },
-      { title: "Course item", type: "Reading", done: false },
-      { title: "Course item", type: "Reading", done: false },
+      { title: "Welcome to SQL for Data Science", type: "Video", done: false },
+      { title: "Day in the Life - An Interview With an Expert", type: "Video", done: false },
+      { title: "Course Overview", type: "Reading", done: false },
+      { title: "SQL Basics", type: "Reading", done: false },
+      { title: "Hello, SQL!", type: "Reading", done: false },
+      { title: "Knowledge Check: SQL Fundamentals", type: "Practice", done: false, duration: "30min" },
     ],
   },
 };
