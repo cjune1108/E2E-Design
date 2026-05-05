@@ -253,7 +253,7 @@ const Sidebar = ({ open, onToggle, courseMode, planDuration = "60min" }) => (
                         <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                           <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>
                         </svg>
-                        <span>Today's plan</span>
+                        <span>Today's learning</span>
                         <span>•</span>
                         <span>{planDuration}</span>
                       </div>
@@ -433,18 +433,18 @@ const QUESTIONS = [
     intro: "Copy that! Since you've already handled simple queries, I've prepared a fast-track for you. Just to make sure we don't skip anything vital, we want to understand your comfort level with basic data retrieval.\n\nQuerying & Filtering Foundations:",
     bold: "Can you Write a SELECT statement and filter results with WHERE?",
     choices: [
-      "I'm still figuring out the basic syntax.",
-      "I can handle SELECT and WHERE, but a quick refresh wouldn't hurt.",
-      "I'm a pro at basics. Skip the intro and let's get to work.",
+      { label: "New to this.", desc: "I'm still figuring out the basic syntax." },
+      { label: "I've seen this.", desc: "I can handle SELECT and WHERE, but a quick refresh wouldn't hurt." },
+      { label: "I know this well.", desc: "I'm a pro at basics. Skip the intro and let's get to work." },
     ],
   },
   {
     intro: "Good to know! Let's check your comfort level with combining data across tables.\n\nJoins & Relationships:",
     bold: "Have you worked with JOIN clauses to combine data from multiple tables?",
     choices: [
-      "JOINs are new to me — I'd love a solid walkthrough.",
-      "I've used INNER JOIN before, but the others confuse me.",
-      "I'm comfortable with all JOIN types including LEFT, RIGHT, and FULL.",
+      { label: "New to this.", desc: "JOINs are new to me — I'd love a solid walkthrough." },
+      { label: "I've seen this.", desc: "I've used INNER JOIN before, but the others confuse me." },
+      { label: "I know this well.", desc: "I'm comfortable with all JOIN types including LEFT, RIGHT, and FULL." },
     ],
   },
 ];
@@ -460,18 +460,25 @@ const ChoiceCard = ({ choices, onSelect, onSkip }) => (
         Skip For Now
       </button>
     </div>
-    {choices.map((text, i) => (
-      <button
-        key={i}
-        onClick={() => onSelect(text)}
-        className="w-full flex items-center gap-3 px-4 py-3.5 text-left hover:bg-gray-50 transition-colors border-b border-gray-100 last:border-b-0 group"
-      >
-        <span className="w-5 h-5 rounded-full border border-gray-300 group-hover:border-indigo-400 flex items-center justify-center shrink-0 text-xs text-gray-400 group-hover:text-indigo-500 font-medium transition-colors">
-          {i + 1}
-        </span>
-        <span className="text-sm text-gray-700 leading-snug">{text}</span>
-      </button>
-    ))}
+    {choices.map((choice, i) => {
+      const label = typeof choice === "string" ? null : choice.label;
+      const text = typeof choice === "string" ? choice : choice.desc;
+      return (
+        <button
+          key={i}
+          onClick={() => onSelect(text)}
+          className="w-full flex items-center gap-3 px-4 py-4 text-left hover:bg-gray-50 transition-colors border-b border-gray-100 last:border-b-0 group"
+        >
+          <span className="w-6 h-6 rounded-md bg-gray-100 flex items-center justify-center shrink-0 text-xs text-gray-500 font-medium">
+            {i + 1}
+          </span>
+          <span className="text-sm text-gray-800 leading-snug">
+            {label && <strong className="font-semibold">{label} </strong>}
+            {text}
+          </span>
+        </button>
+      );
+    })}
   </div>
 );
 
@@ -513,19 +520,19 @@ const PLAN = [
   {
     title: "SQL Fundamentals",
     badge: "⚡ Fast-tracked",
-    badgeColor: "text-yellow-600",
+    badgeColor: "text-gray-600",
     desc: "Since you know the basics, I've cleared the introductory noise. We'll start with Optimized Join Generation to jump straight into action.",
   },
   {
     title: "Advanced Querying (like Joins & CTEs)",
     badge: "🔍 Deep Dive",
     badgeColor: "text-gray-600",
-    desc: "Since you know the basics, I've cleared the introductory noise. We'll start with Optimized Join Generation to jump straight into action.",
+    desc: "Joins and CTEs can be tricky — I've kept the full curriculum here so you get a solid foundation before moving on.",
   },
   {
     title: "Data Engineering with GitHub",
-    badge: "🎯 Goal-Aligned",
-    badgeColor: "text-red-500",
+    badge: "⚡ Fast-tracked",
+    badgeColor: "text-gray-600",
     desc: "Your primary mission. I've injected more practices integration into the GitHub and Capstone modules.",
   },
 ];
@@ -537,10 +544,8 @@ const PlanCard = ({ onAccept, onAdjust, disabled }) => (
       <div className="space-y-5">
         {PLAN.map((item, i) => (
           <div key={i}>
-            <div className="flex items-start justify-between gap-2 mb-1">
-              <span className="text-sm font-semibold text-gray-900">{item.title}</span>
-              <span className={`text-xs font-medium whitespace-nowrap ${item.badgeColor}`}>{item.badge}</span>
-            </div>
+            <span className="text-sm font-semibold text-gray-900">{item.title}</span>
+            <div className={`text-xs font-semibold mt-0.5 mb-1 ${item.badgeColor}`}>{item.badge}</div>
             <p className="text-sm text-gray-500 leading-relaxed">{item.desc}</p>
           </div>
         ))}
@@ -624,10 +629,9 @@ const PLAN_CONTENT = {
     desc: "Adjusted to 30 minutes — enough time to build real momentum. You'll write SELECT queries and start filtering data with WHERE, the two moves that unlock 80% of analytics work.",
     sidebarDesc: "SELECT queries and WHERE filtering",
     items: [
-      { title: "Welcome to SQL for data science", type: "Video", done: false },
-      { title: "Writing your first SELECT", type: "Reading", done: false },
-      { title: "Filtering with WHERE", type: "Reading", done: false },
-      { title: "Practice: filter real datasets", type: "Practice", done: false },
+      { title: "Welcome to SQL for Data Science", type: "Video", done: false, duration: "7min" },
+      { title: "Github basics", type: "Reading", done: false, duration: "8min" },
+      { title: "Python data practice", type: "Practice", done: false, duration: "15min" },
     ],
   },
   "45min": {
@@ -648,8 +652,8 @@ const PLAN_CONTENT = {
     sidebarDesc: "Diving deeper into databases and Jupyter Notebooks",
     items: [
       { title: "Welcome to SQL for Data Science", type: "Video", done: false },
-      { title: "Day in the Life - An Interview With an Expert", type: "Video", done: false },
-      { title: "Course Overview", type: "Reading", done: false },
+      { title: "Github basics", type: "Reading", done: false },
+      { title: "Python data practice", type: "Practice", done: false },
       { title: "SQL Basics", type: "Reading", done: false },
       { title: "Hello, SQL!", type: "Reading", done: false },
       { title: "Knowledge Check: SQL Fundamentals", type: "Practice", done: false, duration: "30min" },
@@ -658,7 +662,7 @@ const PLAN_CONTENT = {
 };
 
 /* ── Today's Plan hero card ── */
-const TodaysPlanCard = ({ duration = "60min", hideStart = false }) => {
+const TodaysPlanCard = ({ duration = "60min", hideStart = false, onStart }) => {
   const content = PLAN_CONTENT[duration] || PLAN_CONTENT["60min"];
   return (
     <div className="border border-gray-200 rounded-2xl overflow-hidden bg-white shadow-sm fade-in">
@@ -666,9 +670,9 @@ const TodaysPlanCard = ({ duration = "60min", hideStart = false }) => {
       <div className="relative bg-gradient-to-br from-slate-100 to-blue-50 px-6 py-6 flex items-center justify-between overflow-hidden" style={{minHeight: 160}}>
         <div className="z-10">
           <span className="inline-block text-xs font-semibold text-gray-500 bg-white/70 rounded-full px-2.5 py-0.5 mb-3">{duration}</span>
-          <h2 className="text-2xl font-bold text-gray-900 mb-4">Welcome! Your today's plan</h2>
+          <h2 className="text-2xl font-bold text-gray-900 mb-4">Welcome! Your today's learning</h2>
           {!hideStart && (
-            <button className="bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-semibold px-5 py-2 rounded-lg transition-colors">
+            <button onClick={onStart} className="bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-semibold px-5 py-2 rounded-lg transition-colors">
               Start
             </button>
           )}
@@ -819,6 +823,12 @@ const App = () => {
     }, 3000);
   };
 
+  /* Skip personalization → course directly (no loading) */
+  const handleSkipToCourse = () => {
+    setSidebarOpen(true);
+    setStage("course");
+  };
+
   /* Adjust learning time button */
   const handleAdjustTime = () => {
     setCourseMessages(prev => [...prev, { role: "user", text: "I want to adjust my time" }]);
@@ -857,23 +867,44 @@ const App = () => {
     }
   }, [courseMessages, courseStage]);
 
+  const [videoItemIndex, setVideoItemIndex] = useState(0);
+  const [completedItems, setCompletedItems] = useState({});
+  const [aiBannerDismissed, setAiBannerDismissed] = useState(false);
+  const [practiceIndex, setPracticeIndex] = useState(0);
+  const [selectedAnswer, setSelectedAnswer] = useState(null);
+  const [answeredCorrect, setAnsweredCorrect] = useState(null);
+  const [aiPanelOpen, setAiPanelOpen] = useState(false);
+  const [reviewConceptOpen, setReviewConceptOpen] = useState(false);
+  const [addedToPlan, setAddedToPlan] = useState(false);
+  const [toastVisible, setToastVisible] = useState(false);
+  const [extraItems, setExtraItems] = useState([]);
+
   const TIME_OPTIONS = ["15min", "30min", "45min"];
 
   const isOnboarding = stage === "onboarding";
   const isCourse = stage === "course";
   const isLoading = stage === "loading";
+  const isVideo = stage === "video";
   const currentQ = QUESTIONS[qIndex];
+
+  const handleStartVideo = () => {
+    setVideoItemIndex(0);
+    setSidebarOpen(false);
+    setStage("video");
+  };
 
   return (
     <div className="flex flex-col h-screen bg-gray-50 overflow-hidden">
       <TopNav courseMode={isCourse} />
       <div className="flex flex-1 overflow-hidden">
-        <Sidebar
-          open={sidebarOpen}
-          onToggle={() => setSidebarOpen(o => !o)}
-          courseMode={isCourse}
-          planDuration={planDuration}
-        />
+        {!isVideo && (
+          <Sidebar
+            open={sidebarOpen}
+            onToggle={() => setSidebarOpen(o => !o)}
+            courseMode={isCourse}
+            planDuration={planDuration}
+          />
+        )}
 
         {/* Main canvas */}
         <main className="flex-1 flex flex-col overflow-hidden bg-white canvas-glow relative">
@@ -889,7 +920,7 @@ const App = () => {
 
                   {/* Today's plan card — always shows original 60min */}
                   <div>
-                    <TodaysPlanCard duration="60min" hideStart={prevDuration !== null} />
+                    <TodaysPlanCard duration="60min" hideStart={prevDuration !== null} onStart={handleStartVideo} />
                     <div className="flex items-center gap-2 mt-4">
                       <FeedbackRow noMargin />
                       {prevDuration && (
@@ -941,7 +972,7 @@ const App = () => {
                         <p className="text-sm text-gray-700 leading-relaxed mb-3">{m.text}</p>
                         {m.planCard && (
                           <div className="mt-2">
-                            <TodaysPlanCard duration={m.planCard} />
+                            <TodaysPlanCard duration={m.planCard} onStart={handleStartVideo} />
                           </div>
                         )}
                         {isLast && <FeedbackRow />}
@@ -973,14 +1004,19 @@ const App = () => {
                     </div>
                   )}
 
-                  {/* Adjust learning time button — only when idle */}
-                  {courseStage === "idle" && (
-                    <div className="flex justify-start">
+                  {/* Quick action buttons — only when idle and no time adjustment made */}
+                  {courseStage === "idle" && prevDuration === null && (
+                    <div className="flex justify-start gap-2 flex-wrap">
                       <button
                         onClick={handleAdjustTime}
                         className="skip-btn bg-white text-gray-600 text-sm rounded-full px-4 py-2 hover:bg-gray-50 transition-colors"
                       >
                         Adjust learning time
+                      </button>
+                      <button
+                        className="skip-btn bg-white text-gray-600 text-sm rounded-full px-4 py-2 hover:bg-gray-50 transition-colors"
+                      >
+                        Self assessment
                       </button>
                     </div>
                   )}
@@ -997,8 +1033,611 @@ const App = () => {
             </>
           )}
 
+          {/* Video view */}
+          {isVideo && (() => {
+            const baseItems = (PLAN_CONTENT[planDuration] || PLAN_CONTENT["60min"]).items;
+            const items = [...baseItems, ...extraItems];
+            const item = items[videoItemIndex];
+            const rightTools = [
+              { label: "Transcript", icon: <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg> },
+              { label: "Notes", icon: <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg> },
+              { label: "Files", icon: <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg> },
+              { label: "Resources", icon: <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>, active: true },
+              { label: "Practice", icon: <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 8 12 12 14 14"/></svg> },
+            ];
+            return (
+              <>
+              <div className="flex flex-1 overflow-hidden">
+                {/* Left panel — course item list */}
+                <div className="w-72 border-r border-gray-200 flex flex-col overflow-hidden bg-white shrink-0">
+                  {/* Course title */}
+                  <div className="px-4 pt-4 pb-3 border-b border-gray-100">
+                    <p className="text-xs font-semibold text-gray-900 leading-snug mb-1">SQL for Data Science (and Version Control with GitHub)</p>
+                    <button className="text-xs text-indigo-600 font-medium hover:underline">Course progress</button>
+                  </div>
+                  {/* Today's mini card */}
+                  {(() => {
+                    const c = PLAN_CONTENT[planDuration] || PLAN_CONTENT["60min"];
+                    return (
+                      <div className="mx-3 mt-3 mb-2 rounded-xl border border-gray-200 bg-gray-50 overflow-hidden">
+                        <div className="flex items-start justify-between px-3 pt-3 pb-3">
+                          <div className="flex-1">
+                            <div className="flex items-center gap-1.5 text-xs text-gray-500 mb-1">
+                              <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+                              <span>Today's learning</span>
+                              <span>•</span>
+                              <span>{planDuration}</span>
+                            </div>
+                            <p className="text-xs text-gray-700 leading-snug">{c.sidebarDesc}</p>
+                          </div>
+                          <div className="shrink-0 ml-2 w-10"><IsometricIllustration /></div>
+                        </div>
+                      </div>
+                    );
+                  })()}
+                  {/* Items */}
+                  <div className="flex-1 overflow-y-auto px-3 pb-4">
+                    {/* Base course items */}
+                    {baseItems.map((it, i) => (
+                      <button
+                        key={i}
+                        onClick={() => setVideoItemIndex(i)}
+                        className={`w-full flex items-start gap-2.5 py-2.5 px-2 rounded-lg text-left transition-colors ${i === videoItemIndex ? "bg-indigo-50" : "hover:bg-gray-50"}`}
+                      >
+                        <div className="mt-0.5 shrink-0">
+                          {completedItems[i] ? (
+                            <div className="w-5 h-5 rounded-full bg-green-500 flex items-center justify-center">
+                              <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+                            </div>
+                          ) : (
+                            <div className={`w-5 h-5 rounded-full border-2 ${i === videoItemIndex ? "border-indigo-500 bg-indigo-50" : "border-gray-300 bg-white"}`} />
+                          )}
+                        </div>
+                        <div>
+                          <p className={`text-xs font-medium leading-snug ${i === videoItemIndex ? "text-indigo-700" : "text-gray-800"}`}>{it.title}</p>
+                          <p className="text-xs text-gray-400 mt-0.5">{it.type} • {it.duration || "6min"}</p>
+                        </div>
+                      </button>
+                    ))}
+
+                    {/* Added by you section */}
+                    {extraItems.length > 0 && (
+                      <div className="mt-2">
+                        <div className="h-px bg-gray-200 mx-2 mb-3" />
+                        <p className="text-xs font-semibold text-gray-800 px-2 mb-1">Added by you</p>
+                        {extraItems.map((it, j) => {
+                          const i = baseItems.length + j;
+                          return (
+                            <button
+                              key={i}
+                              onClick={() => setVideoItemIndex(i)}
+                              className={`w-full flex items-start gap-2.5 py-2.5 px-2 rounded-lg text-left transition-colors ${i === videoItemIndex ? "bg-indigo-50" : "hover:bg-gray-50"}`}
+                            >
+                              <div className="mt-0.5 shrink-0">
+                                {completedItems[i] ? (
+                                  <div className="w-5 h-5 rounded-full bg-green-500 flex items-center justify-center">
+                                    <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+                                  </div>
+                                ) : (
+                                  <div className={`w-5 h-5 rounded-full border-2 ${i === videoItemIndex ? "border-indigo-500 bg-indigo-50" : "border-gray-300 bg-white"}`} />
+                                )}
+                              </div>
+                              <div>
+                                <p className={`text-xs font-medium leading-snug ${i === videoItemIndex ? "text-indigo-700" : "text-gray-800"}`}>{it.title}</p>
+                                <p className="text-xs text-gray-400 mt-0.5">{it.type} • {it.duration || "6min"}</p>
+                              </div>
+                            </button>
+                          );
+                        })}
+                      </div>
+                    )}
+                  </div>
+                </div>
+
+                {/* Center — content area (video or reading) */}
+                <div className="flex-1 flex flex-col overflow-hidden bg-white">
+                  <div className="flex-1 overflow-y-auto">
+
+                    {item.type === "Practice" ? (() => {
+                      const PRACTICE_QUESTIONS = [
+                        {
+                          question: "What is the output of the following code?",
+                          code: `nums = [50, 60, 80, 40]\nprint(nums[2])`,
+                          options: ["60", "50", "40", "80"],
+                          correct: 3,
+                          hint: "Think back to how indexing works, it's not the same as counting the items in a list.",
+                        },
+                        {
+                          question: "What is the output of the following code?",
+                          code: `nums = [10, 30, 20, 40]\nprint(nums[2])`,
+                          options: ["40", "30", "20", "10"],
+                          correct: 2,
+                          hint: null,
+                          hintRich: true,
+                        },
+                      ];
+                      const q = PRACTICE_QUESTIONS[practiceIndex];
+                      return (
+                        <div className="max-w-2xl mx-auto px-10 py-8">
+                          <h1 className="text-2xl font-bold text-gray-900 mb-6">{item.title}</h1>
+
+                          {/* Question card */}
+                          <div className="border border-gray-200 rounded-2xl overflow-hidden mb-5">
+                            {/* Question */}
+                            <div className="px-6 pt-5 pb-4">
+                              <p className="text-sm font-semibold text-gray-900 mb-4">{q.question}</p>
+
+                              {/* Code block */}
+                              {q.code && (
+                                <div className="rounded-xl overflow-hidden border border-gray-200 mb-4">
+                                  <div className="flex items-center justify-between px-4 py-2 bg-gray-50 border-b border-gray-200">
+                                    <span className="text-xs font-medium text-gray-500">Example</span>
+                                    <button className="text-gray-400 hover:text-gray-600 transition-colors">
+                                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+                                    </button>
+                                  </div>
+                                  <div className="bg-white px-4 py-3">
+                                    <pre className="text-sm font-mono leading-relaxed">
+                                      {q.code.split("\n").map((line, li) => (
+                                        <div key={li}>
+                                          {line.includes("=") && !line.includes("print") ? (
+                                            <span>
+                                              <span className="text-gray-800">{line.split("=")[0]}= </span>
+                                              <span className="text-indigo-500">{line.split("=")[1]}</span>
+                                            </span>
+                                          ) : line.includes("print") ? (
+                                            <span>
+                                              <span className="text-green-600">print</span>
+                                              <span className="text-gray-800">{line.replace("print", "")}</span>
+                                            </span>
+                                          ) : (
+                                            <span className="text-gray-800">{line}</span>
+                                          )}
+                                        </div>
+                                      ))}
+                                    </pre>
+                                  </div>
+                                </div>
+                              )}
+
+                              {/* Answer options */}
+                              <div className="space-y-2">
+                                {q.options.map((opt, oi) => {
+                                  const isSelected = selectedAnswer === oi;
+                                  const isCorrect = oi === q.correct;
+                                  const showResult = selectedAnswer !== null;
+                                  const showHint = showResult && isSelected && !isCorrect;
+                                  let borderClass = "border-gray-200 hover:border-gray-300";
+                                  let bgClass = "bg-white hover:bg-gray-50";
+                                  let textClass = "text-gray-800";
+                                  if (showResult && isSelected && isCorrect) { borderClass = "border-green-400"; bgClass = "bg-green-50"; textClass = "text-green-700"; }
+                                  if (showResult && isSelected && !isCorrect) { borderClass = "border-red-400"; bgClass = "bg-red-50"; textClass = "text-red-700"; }
+                                  return (
+                                    <React.Fragment key={oi}>
+                                      <button
+                                        onClick={() => { setSelectedAnswer(oi); setAnsweredCorrect(oi === q.correct); }}
+                                        disabled={selectedAnswer !== null}
+                                        className={`w-full text-center py-3 px-4 border rounded-xl text-sm font-medium transition-colors ${borderClass} ${bgClass} ${textClass}`}
+                                      >
+                                        {opt}
+                                      </button>
+                                      {showHint && (q.hint || q.hintRich) && (
+                                        <div className="bg-blue-50 border border-blue-100 rounded-xl px-4 py-3.5">
+                                          <div className="flex items-start gap-2.5 mb-2">
+                                            <svg width="15" height="15" viewBox="0 0 24 24" fill="#6366f1" className="shrink-0 mt-0.5">
+                                              <path d="M12 2l2.09 6.26L20 9.27l-4.91 3.57L16.18 19 12 15.77 7.82 19l1.09-6.16L4 9.27l5.91-1.01L12 2z"/>
+                                            </svg>
+                                            <div className="flex-1">
+                                              <p className="text-sm font-semibold text-gray-900 mb-1">Almost!</p>
+                                              {q.hintRich ? (
+                                                <p className="text-sm text-gray-600 leading-snug">
+                                                  It's a common mix-up! Python lists start at index 0, so <strong className="text-gray-900">nums[2]</strong> is the third item. That's 20, not 30.{" "}
+                                                  <button onClick={() => setReviewConceptOpen(true)} className="inline-flex items-center gap-1 text-indigo-600 hover:text-indigo-700 text-xs font-medium">
+                                                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>
+                                                    Review concept
+                                                  </button>
+                                                </p>
+                                              ) : (
+                                                <p className="text-sm text-gray-600 leading-snug">{q.hint}</p>
+                                              )}
+                                            </div>
+                                          </div>
+                                          {q.hintRich && (
+                                            <div className="flex justify-end">
+                                              <button
+                                                onClick={() => setAiPanelOpen(true)}
+                                                className="flex items-center gap-1.5 text-sm font-semibold text-indigo-600 border border-indigo-200 rounded-lg px-3 py-1.5 hover:bg-indigo-50 transition-colors"
+                                              >
+                                                <svg width="13" height="13" viewBox="0 0 24 24" fill="#6366f1"><path d="M12 2l2.09 6.26L20 9.27l-4.91 3.57L16.18 19 12 15.77 7.82 19l1.09-6.16L4 9.27l5.91-1.01L12 2z"/></svg>
+                                                Help me understand
+                                              </button>
+                                            </div>
+                                          )}
+                                        </div>
+                                      )}
+                                    </React.Fragment>
+                                  );
+                                })}
+                              </div>
+                            </div>
+                          </div>
+
+                          {/* Pagination */}
+                          <div className="flex items-center justify-center gap-6 mb-5">
+                            <button
+                              onClick={() => { if (practiceIndex > 0) { setPracticeIndex(i => i - 1); setSelectedAnswer(null); setAnsweredCorrect(null); } }}
+                              className="text-gray-400 hover:text-gray-600 disabled:opacity-30 transition-colors"
+                              disabled={practiceIndex === 0}
+                            >
+                              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
+                            </button>
+                            <span className="text-sm text-gray-500 font-medium">{practiceIndex + 1}/{PRACTICE_QUESTIONS.length}</span>
+                            <button
+                              onClick={() => { if (practiceIndex < PRACTICE_QUESTIONS.length - 1) { setPracticeIndex(i => i + 1); setSelectedAnswer(null); setAnsweredCorrect(null); } }}
+                              className="text-gray-400 hover:text-gray-600 disabled:opacity-30 transition-colors"
+                              disabled={practiceIndex === PRACTICE_QUESTIONS.length - 1}
+                            >
+                              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
+                            </button>
+                          </div>
+
+                          {/* Rate quality */}
+                          <div className="flex items-center justify-center gap-2 text-sm text-gray-400">
+                            <span>Rate the quality of this practice</span>
+                            <button className="hover:text-gray-600 transition-colors">
+                              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M14 9V5a3 3 0 0 0-3-3l-4 9v11h11.28a2 2 0 0 0 2-1.7l1.38-9a2 2 0 0 0-2-2.3H14z"/><path d="M7 22H4a2 2 0 0 1-2-2v-7a2 2 0 0 1 2-2h3"/></svg>
+                            </button>
+                            <button className="hover:text-gray-600 transition-colors">
+                              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M10 15v4a3 3 0 0 0 3 3l4-9V2H5.72a2 2 0 0 0-2 1.7l-1.38 9a2 2 0 0 0 2 2.3H10z"/><path d="M17 2h2.67A2.31 2.31 0 0 1 22 4v7a2.31 2.31 0 0 1-2.33 2H17"/></svg>
+                            </button>
+                          </div>
+                        </div>
+                      );
+                    })() : item.type === "Video" ? (
+                      <>
+                        {/* Video player */}
+                        <div className="relative w-full bg-[#2d3748]" style={{aspectRatio: "16/9", maxHeight: "60vh"}}>
+                          <div className="absolute inset-0 bg-gradient-to-br from-[#2d3748] via-[#3a4a5c] to-[#2d3748]" />
+                          <div className="absolute top-4 left-4 w-3 h-3 rounded-full border-2 border-[#63b3ed] opacity-80" />
+                          <div className="absolute top-4 right-4 w-3 h-3 rounded-full border-2 border-[#63b3ed] opacity-80" />
+                          <div className="absolute bottom-14 left-4 w-3 h-3 rounded-full border-2 border-[#63b3ed] opacity-80" />
+                          <div className="absolute bottom-14 right-4 w-3 h-3 rounded-full border-2 border-[#63b3ed] opacity-80" />
+                          <div className="absolute inset-0 flex items-center justify-center pb-10">
+                            <button className="w-14 h-14 rounded-full bg-white/25 hover:bg-white/35 backdrop-blur-sm flex items-center justify-center transition-colors">
+                              <svg width="22" height="22" viewBox="0 0 24 24" fill="white" stroke="none"><polygon points="6 3 20 12 6 21 6 3"/></svg>
+                            </button>
+                          </div>
+                          <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/70 to-transparent px-4 pb-3 pt-6">
+                            <div className="relative h-1 bg-white/30 rounded-full mb-3 cursor-pointer group">
+                              <div className="h-full w-1/3 bg-white rounded-full relative">
+                                <div className="absolute right-0 top-1/2 -translate-y-1/2 w-3 h-3 rounded-full bg-white shadow opacity-0 group-hover:opacity-100 transition-opacity" />
+                              </div>
+                            </div>
+                            <div className="flex items-center justify-between">
+                              <div className="flex items-center gap-3">
+                                <button className="text-white"><svg width="18" height="18" viewBox="0 0 24 24" fill="white" stroke="none"><polygon points="6 3 20 12 6 21 6 3"/></svg></button>
+                                <button className="text-white/80 hover:text-white"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polygon points="19 20 9 12 19 4 19 20"/><line x1="5" y1="19" x2="5" y2="5"/></svg></button>
+                                <button className="text-white/80 hover:text-white"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07"/></svg></button>
+                                <span className="text-white/80 text-xs font-mono">1:24 / 6:00</span>
+                              </div>
+                              <div className="flex items-center gap-3">
+                                <button className="text-white/80 text-xs font-bold border border-white/50 rounded px-1.5 py-0.5">CC</button>
+                                <button className="text-white/80 text-xs">1x</button>
+                                <button className="text-white/80 hover:text-white"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3"/></svg></button>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                        <div className="px-8 py-5 flex items-start justify-between gap-4 border-b border-gray-100">
+                          <h2 className="text-base font-semibold text-gray-900">{item.title}</h2>
+                          <button className="flex items-center gap-1.5 text-xs text-gray-500 hover:text-gray-700 shrink-0 mt-0.5">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+                            Save note
+                          </button>
+                        </div>
+                        <div className="px-8 py-5">
+                          <p className="text-sm text-gray-500 leading-relaxed">In this video, you'll get an introduction to SQL for Data Science. We'll explore the foundational concepts that power data analysis and how SQL fits into a modern data workflow.</p>
+                        </div>
+                      </>
+                    ) : (
+                      /* Reading view */
+                      <div className="max-w-2xl mx-auto px-10 py-8">
+                        {/* Page title */}
+                        <h1 className="text-2xl font-bold text-gray-900 mb-5">{item.title}</h1>
+
+                        {/* AI summary banner */}
+                        {!aiBannerDismissed && (
+                          <div className="flex items-start gap-3 bg-gray-50 border border-gray-200 rounded-xl px-4 py-3.5 mb-6">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" className="shrink-0 mt-0.5 text-indigo-500" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 3l1.88 5.76a1 1 0 0 0 .95.69h6.07l-4.91 3.57a1 1 0 0 0-.36 1.12L17.5 20l-4.91-3.57a1 1 0 0 0-1.18 0L6.5 20l1.88-5.86a1 1 0 0 0-.36-1.12L3.1 9.45h6.07a1 1 0 0 0 .95-.69L12 3z"/></svg>
+                            <p className="text-sm text-gray-700 leading-relaxed flex-1">Based on evaluation of your skills, we summarized key concepts from 4 readings to save you 24min time.</p>
+                            <button onClick={() => setAiBannerDismissed(true)} className="text-gray-400 hover:text-gray-600 shrink-0 mt-0.5 transition-colors">
+                              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+                            </button>
+                          </div>
+                        )}
+
+                        {/* Reading content */}
+                        <div className="space-y-6">
+                          <div>
+                            <h2 className="text-lg font-bold text-gray-900 mb-3">What is GitHub and why does it matter for data work?</h2>
+                            <p className="text-sm text-gray-600 leading-relaxed">GitHub is a platform built on top of Git, a version control system that tracks changes to your code over time. For data scientists and analysts, GitHub serves as both a collaboration tool and a safety net — you can experiment freely knowing you can always roll back to a previous version. In a data engineering context, this is especially valuable when working on SQL scripts, pipeline configurations, or notebook files that multiple team members touch simultaneously. Think of it as a shared Google Doc, but with a full history of every edit ever made and the ability to run multiple versions in parallel.</p>
+                          </div>
+                          <div>
+                            <h2 className="text-lg font-bold text-gray-900 mb-3">Core concepts: repositories, commits, and branches</h2>
+                            <p className="text-sm text-gray-600 leading-relaxed">A repository (or "repo") is the project folder that GitHub tracks. Every change you save is called a commit — a snapshot of your work at a specific point in time, with a message describing what you did. Branches let you work on a new feature or fix without touching the main codebase. Once your work is ready, you open a pull request to merge it back in, where teammates can review and leave comments before the changes go live. For data engineering projects, a typical workflow might involve a main branch holding production-ready SQL pipelines, and feature branches for iterating on new transformations or schema changes. Keeping your work in branches prevents half-finished changes from breaking the pipelines your team depends on every day.</p>
+                          </div>
+                        </div>
+
+                        {/* Mark as completed + feedback */}
+                        <div className="mt-8 pt-6 border-t border-gray-100">
+                          <button
+                            onClick={() => setCompletedItems(prev => ({...prev, [videoItemIndex]: true}))}
+                            className={`px-5 py-2.5 rounded-lg text-sm font-semibold transition-colors mb-4 ${completedItems[videoItemIndex] ? "bg-green-600 text-white" : "bg-indigo-600 hover:bg-indigo-700 text-white"}`}
+                          >
+                            {completedItems[videoItemIndex] ? "✓ Completed" : "Mark as completed"}
+                          </button>
+                          <div className="flex items-center gap-4">
+                            <button className="flex items-center gap-1.5 text-sm text-indigo-600 hover:text-indigo-700 transition-colors">
+                              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M14 9V5a3 3 0 0 0-3-3l-4 9v11h11.28a2 2 0 0 0 2-1.7l1.38-9a2 2 0 0 0-2-2.3H14z"/><path d="M7 22H4a2 2 0 0 1-2-2v-7a2 2 0 0 1 2-2h3"/></svg>
+                              Like
+                            </button>
+                            <button className="flex items-center gap-1.5 text-sm text-indigo-600 hover:text-indigo-700 transition-colors">
+                              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M10 15v4a3 3 0 0 0 3 3l4-9V2H5.72a2 2 0 0 0-2 1.7l-1.38 9a2 2 0 0 0 2 2.3H10z"/><path d="M17 2h2.67A2.31 2.31 0 0 1 22 4v7a2.31 2.31 0 0 1-2.33 2H17"/></svg>
+                              Dislike
+                            </button>
+                            <button className="flex items-center gap-1.5 text-sm text-indigo-600 hover:text-indigo-700 transition-colors">
+                              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"/><line x1="4" y1="22" x2="4" y2="15"/></svg>
+                              Report an issue
+                            </button>
+                          </div>
+                        </div>
+                      </div>
+                    )}
+
+                  </div>
+
+                  {/* Bottom bar */}
+                  <div className="border-t border-gray-200 bg-white px-6 py-3 flex items-center justify-between shrink-0">
+                    <button
+                      onClick={() => { setSidebarOpen(true); setStage("course"); }}
+                      className="text-sm text-gray-500 hover:text-gray-700 flex items-center gap-1.5 transition-colors"
+                    >
+                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
+                      Back
+                    </button>
+                    <button
+                      onClick={() => {
+                        if (videoItemIndex < items.length - 1) {
+                          setCompletedItems(prev => ({...prev, [videoItemIndex]: true}));
+                          setAiBannerDismissed(false);
+                          setPracticeIndex(0);
+                          setSelectedAnswer(null);
+                          setAnsweredCorrect(null);
+                          setAiPanelOpen(false);
+                          setVideoItemIndex(idx => idx + 1);
+                        }
+                      }}
+                      className="flex items-center gap-2 text-sm font-medium text-gray-700 hover:text-gray-900 border border-gray-200 rounded-lg px-4 py-2 hover:bg-gray-50 transition-colors"
+                    >
+                      Next item
+                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
+                    </button>
+                  </div>
+                </div>
+
+                {/* Right: AI panel (any item type) or toolbar (non-Practice only) */}
+                {aiPanelOpen ? (
+                  <div className="w-96 border-l border-gray-200 bg-white flex flex-col shrink-0 overflow-hidden">
+                    {/* Header */}
+                    <div className="flex items-center justify-between px-3 py-3 shrink-0">
+                      <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
+                        <defs><linearGradient id="aiGrad2" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stopColor="#6366f1"/><stop offset="100%" stopColor="#06b6d4"/></linearGradient></defs>
+                        <path d="M12 2l1.8 5.4L19 9l-4.5 3.3 1.1 6.3L12 15.5l-3.6 3.1 1.1-6.3L5 9l5.2-1.6L12 2z" fill="url(#aiGrad2)"/>
+                        <circle cx="7" cy="5" r="1.2" fill="url(#aiGrad2)"/>
+                      </svg>
+                      <div className="flex items-center gap-0.5">
+                        <button className="w-8 h-8 flex items-center justify-center rounded-lg hover:bg-gray-100 text-gray-500 transition-colors">
+                          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="10" y1="10" x2="14" y2="10"/></svg>
+                        </button>
+                        <button className="w-8 h-8 flex items-center justify-center rounded-lg hover:bg-gray-100 text-gray-500 transition-colors">
+                          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+                        </button>
+                        <button onClick={() => setAiPanelOpen(false)} className="w-8 h-8 flex items-center justify-center rounded-lg hover:bg-gray-100 text-gray-500 transition-colors">
+                          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+                        </button>
+                      </div>
+                    </div>
+
+                    {/* Chat messages */}
+                    <div className="flex-1 overflow-y-auto px-4 pb-4 flex flex-col justify-end gap-4">
+                      {/* User message bubble */}
+                      <div className="flex justify-end">
+                        <div className="bg-[#f0f6ff] text-[#1e2229] text-sm rounded-tl-2xl rounded-tr-2xl rounded-bl-2xl px-3 py-2 max-w-[85%] leading-relaxed">
+                          Help me understand
+                        </div>
+                      </div>
+
+                      {/* AI response — no bubble, plain text */}
+                      <div className="space-y-3">
+                        <p className="text-sm text-[#1e2229] leading-6">
+                          It looks like you might be stuck on indexing.<br/>Let's break it down quickly 👇
+                        </p>
+                        <p className="text-sm text-[#1e2229] leading-6">
+                          In Python, list indexing follows a "zero-based" system. This means you start counting at 0, not 1. Because of this, the index number doesn't match the "human" position of the item in the list.
+                        </p>
+                        <p className="text-sm text-[#1e2229] leading-6">Here is how the computer sees the nums list:</p>
+                        <ul className="space-y-0.5 pl-4 list-disc">
+                          {["nums[0] is 10 (The 1st item)","nums[1] is 30 (The 2nd item)","nums[2] is 20 (The 3rd item)","nums[3] is 40 (The 4th item)"].map((line, i) => (
+                            <li key={i} className="text-sm text-[#1e2229] leading-6">{line}</li>
+                          ))}
+                        </ul>
+                        <p className="text-sm text-[#1e2229] leading-6">
+                          ✨ <span className="font-semibold">Key Concept:</span> To find the correct index for any item, take its physical position and subtract one (Position - 1 = Index).
+                        </p>
+
+                        {/* Action icons */}
+                        <div className="flex items-center gap-0.5 pt-1">
+                          {[
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>,
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><path d="M14 9V5a3 3 0 0 0-3-3l-4 9v11h11.28a2 2 0 0 0 2-1.7l1.38-9a2 2 0 0 0-2-2.3H14z"/><path d="M7 22H4a2 2 0 0 1-2-2v-7a2 2 0 0 1 2-2h3"/></svg>,
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><path d="M10 15v4a3 3 0 0 0 3 3l4-9V2H5.72a2 2 0 0 0-2 1.7l-1.38 9a2 2 0 0 0 2 2.3H10z"/><path d="M17 2h2.67A2.31 2.31 0 0 1 22 4v7a2.31 2.31 0 0 1-2.33 2H17"/></svg>,
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg>,
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="1"/><circle cx="19" cy="12" r="1"/><circle cx="5" cy="12" r="1"/></svg>,
+                          ].map((icon, i) => (
+                            <button key={i} className="w-7 h-7 flex items-center justify-center rounded-lg hover:bg-gray-100 text-gray-400 hover:text-gray-600 transition-colors">{icon}</button>
+                          ))}
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Composer */}
+                    <div className="px-4 pb-3 pt-2 shrink-0">
+                      <div className="flex items-center gap-2 bg-[#f2f5fa] rounded-lg px-3 py-2 mb-2">
+                        <button className="text-gray-400 hover:text-gray-600 shrink-0">
+                          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+                        </button>
+                        <input type="text" placeholder="Text placeholder" className="flex-1 bg-transparent text-sm text-[#5b6780] placeholder-[#5b6780] outline-none" />
+                        <button className="text-gray-400 hover:text-gray-600 shrink-0">
+                          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="23"/><line x1="8" y1="23" x2="16" y2="23"/></svg>
+                        </button>
+                        <button className="w-8 h-8 bg-[#0056d2] rounded-lg flex items-center justify-center hover:bg-blue-700 transition-colors shrink-0">
+                          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><line x1="12" y1="19" x2="12" y2="5"/><polyline points="5 12 12 5 19 12"/></svg>
+                        </button>
+                      </div>
+                      <p className="text-[11px] text-[#404b61] leading-snug text-center">
+                        This tool is powered by AI, so check for mistakes and don't share sensitive or personal information.{" "}
+                        <button className="underline hover:text-gray-600">Learn More</button>.
+                      </p>
+                    </div>
+                  </div>
+                ) : item.type !== "Practice" ? (
+                  <div className="w-16 border-l border-gray-200 bg-white flex flex-col items-center py-4 gap-1 shrink-0">
+                    {rightTools.map((t, i) => (
+                      <button key={i} className={`flex flex-col items-center gap-1 py-3 px-2 rounded-lg w-full transition-colors ${t.active ? "text-indigo-600 font-semibold" : "text-gray-400 hover:text-gray-700"}`}>
+                        {t.icon}
+                        <span className="text-[10px] font-medium">{t.label}</span>
+                      </button>
+                    ))}
+                  </div>
+                ) : null}
+              </div>
+              {/* Review Concept Modal */}
+              {reviewConceptOpen && (
+                <div className="absolute inset-0 z-50 bg-black/40 flex items-center justify-center p-6">
+                  <div className="bg-white rounded-2xl shadow-2xl w-full max-w-3xl max-h-[92vh] flex flex-col overflow-hidden">
+
+                    {/* Header: title + close */}
+                    <div className="shrink-0">
+                      <div className="flex items-center justify-between px-6 py-4">
+                        <h2 className="text-xl font-semibold text-[#0f1114] tracking-tight">Concept review</h2>
+                        <button onClick={() => setReviewConceptOpen(false)} className="w-8 h-8 flex items-center justify-center rounded-lg hover:bg-gray-100 text-gray-500 transition-colors">
+                          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+                        </button>
+                      </div>
+                      <div className="h-px bg-gray-200 w-full" />
+                    </div>
+
+                    {/* Scrollable body */}
+                    <div className="flex-1 overflow-y-auto px-8 py-6">
+
+                      {/* Video player */}
+                      <div className="relative rounded-2xl overflow-hidden mb-4" style={{aspectRatio:"16/9", background:"#2f2f2f"}}>
+                        <img
+                          src="https://www.figma.com/api/mcp/asset/29ca79cc-236d-48b2-adac-2dbe24009af7"
+                          className="absolute inset-0 w-full h-full object-cover"
+                          alt="Video thumbnail"
+                        />
+                        {/* Scrubber + controls overlay */}
+                        <div className="absolute bottom-0 left-0 right-0">
+                          {/* Progress bar */}
+                          <div className="px-3 pb-1">
+                            <div className="h-1.5 bg-white/30 rounded-full">
+                              <div className="h-full w-[2%] bg-[#3587fc] rounded-full" />
+                            </div>
+                          </div>
+                          {/* Controls bar */}
+                          <div className="flex items-center justify-between px-3 pb-3 text-white text-xs">
+                            <div className="flex items-center gap-2">
+                              <button className="p-1 hover:bg-white/10 rounded">
+                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="6" y="4" width="4" height="16"/><rect x="14" y="4" width="4" height="16"/></svg>
+                              </button>
+                              <button className="p-1 hover:bg-white/10 rounded">
+                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M15.54 8.46a5 5 0 0 1 0 7.07"/></svg>
+                              </button>
+                              <button className="p-1 hover:bg-white/10 rounded">
+                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 .49-4.51"/></svg>
+                              </button>
+                              <span className="font-mono text-[11px]">0:00  /  4:00</span>
+                              <button className="p-1 hover:bg-white/10 rounded">
+                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg>
+                              </button>
+                            </div>
+                            <div className="flex items-center gap-2">
+                              <span className="font-bold">1x</span>
+                              <button className="p-1 hover:bg-white/10 rounded">
+                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="2" y="7" width="20" height="15" rx="2"/><polyline points="17 2 12 7 7 2"/></svg>
+                              </button>
+                              <button className="p-1 hover:bg-white/10 rounded">
+                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+                              </button>
+                              <button className="p-1 hover:bg-white/10 rounded">
+                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3"/></svg>
+                              </button>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* Video title */}
+                      <h3 className="text-2xl font-semibold text-[#1f1f1f] tracking-tight mb-5">Indexing overview</h3>
+
+                      {/* Transcript */}
+                      <p className="text-sm font-semibold text-[#0f1114] mb-3">Transcript</p>
+                      <div className="space-y-0">
+                        {[
+                          { time: "0:00", text: "Right now data is being generated all around the world and we're talking tons of data. Every minute of every day millions of texts and hundreds of millions of emails are sent. On top of that, millions of online searches are made and videos viewed and those numbers are only growing. That's a lot of data. Let's learn more about how it's made and used. In this video, we'll talk about the ways that data can be generated and how industries collect data themselves. Every piece of information is data." },
+                          { time: "0:22", text: "All that data is usually generated as a result of our activity in the world. These days, we spend a lot of time online. With social media and mobile devices, millions and millions of people are adding to the huge amount of data out there, each and every day. Think about it like this. Every digital photo online is one piece of data. Every photo itself holds even more data, from the number of pixels to the colors contained in each of those pixels. But that's not the only way data is made." },
+                          { time: "0:51", text: "We can also generate data by collecting information. This data generation and collection comes with a few more things to think about. It needs to be done with consideration to ethics so that we maintain people's rights and privacy. We'll learn more about that later on. For now, let's check out a real world example." },
+                        ].map((entry, i) => (
+                          <div key={i} className="flex gap-4 py-1">
+                            <span className="text-[11px] text-[#636363] font-mono shrink-0 w-7 mt-0.5 leading-[1.5]">{entry.time}</span>
+                            <p className="text-[11px] text-[#1f1f1f] leading-[1.5]">{entry.text}</p>
+                          </div>
+                        ))}
+                      </div>
+
+                      {/* Add to learning plan — bottom right */}
+                      <div className="relative flex justify-end mt-6 pb-2">
+                        {toastVisible && (
+                          <div className="absolute bottom-full mb-3 right-0 bg-gray-900 text-white rounded-xl px-4 py-3 shadow-xl text-sm w-72">
+                            <div className="font-semibold mb-0.5">Item added to learning block</div>
+                            <div className="text-gray-300 text-xs">It will appear at the end of your learning block</div>
+                          </div>
+                        )}
+                        <button
+                          onClick={() => {
+                            if (!addedToPlan) {
+                              setAddedToPlan(true);
+                              setExtraItems(prev => [...prev, { title: "Indexing overview", type: "Video", done: false }]);
+                              setToastVisible(true);
+                              setTimeout(() => setToastVisible(false), 3000);
+                            }
+                          }}
+                          className={`text-sm font-semibold border rounded-lg px-4 py-2 transition-colors tracking-wide ${addedToPlan ? "text-gray-400 border-gray-200 cursor-default" : "text-[#0056d2] border-[#0056d2] hover:bg-blue-50"}`}
+                        >
+                          {addedToPlan ? "Added to learning plan" : "Add to learning plan"}
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              )}
+            </>
+            );
+          })()}
+
           {/* Onboarding + conversation view */}
-          {!isLoading && !isCourse && (
+          {!isLoading && !isCourse && !isVideo && (
             <>
               {/* Top gradient — only on onboarding */}
               {isOnboarding && (
@@ -1029,8 +1668,6 @@ const App = () => {
                       <p className="text-sm text-gray-700 leading-relaxed">
                         To personalize your journey, how would you{" "}
                         <strong className="font-semibold text-gray-900">describe your overall comfort level with these areas</strong>
-                        ? Are you looking for{" "}
-                        <strong className="font-semibold text-gray-900">a full deep-dive, or should we skip to the advanced professional workflows</strong>
                         ?
                       </p>
                       <FeedbackRow />
@@ -1093,7 +1730,7 @@ const App = () => {
                   {isOnboarding && (
                     <div className="flex justify-start">
                       <button
-                        onClick={() => handleInitialSend("Skip personalization and start course for today")}
+                        onClick={handleSkipToCourse}
                         className="skip-btn bg-white text-gray-600 text-sm rounded-full px-4 py-2 hover:bg-gray-50 transition-colors"
                       >
                         Skip personalization and start course for today
