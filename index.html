@@ -430,7 +430,7 @@ const EditIcon = () => (
 /* ── Question bank ── */
 const QUESTIONS = [
   {
-    intro: "Copy that! Since you've already handled simple queries, I've prepared a fast-track for you. Just to make sure we don't skip anything vital, we want to understand your comfort level with basic data retrieval.\n\nQuerying & Filtering Foundations:",
+    intro: "Since you've already handled simple queries, we can summarize these topics so you can focus on those that are new.\n\nQuerying & Filtering Foundations:",
     bold: "Can you Write a SELECT statement and filter results with WHERE?",
     choices: [
       { label: "New to this.", desc: "I'm still figuring out the basic syntax." },
@@ -519,52 +519,41 @@ const ThinkingDots = () => (
 const PLAN = [
   {
     title: "SQL Fundamentals",
-    badge: "⚡ Fast-tracked",
-    badgeColor: "text-gray-600",
+    badge: "Fast-tracked",
     desc: "Since you know the basics, I've cleared the introductory noise. We'll start with Optimized Join Generation to jump straight into action.",
   },
   {
-    title: "Advanced Querying (like Joins & CTEs)",
-    badge: "🔍 Deep Dive",
-    badgeColor: "text-gray-600",
-    desc: "Joins and CTEs can be tricky — I've kept the full curriculum here so you get a solid foundation before moving on.",
+    title: "Advanced Querying",
+    badge: "Deep-dive",
+    desc: "Since you know the basics, I've cleared the introductory noise. We'll start with Optimized Join Generation to jump straight into action.",
   },
   {
     title: "Data Engineering with GitHub",
-    badge: "⚡ Fast-tracked",
-    badgeColor: "text-gray-600",
+    badge: "Goal-aligned",
     desc: "Your primary mission. I've injected more practices integration into the GitHub and Capstone modules.",
   },
 ];
 
 const PlanCard = ({ onAccept, onAdjust, disabled }) => (
-  <div className="border border-gray-200 rounded-2xl overflow-hidden bg-white shadow-sm">
-    <div className="px-5 pt-5 pb-4">
-      <h3 className="text-base font-bold text-gray-900 mb-4">Your personalized learning plan</h3>
-      <div className="space-y-5">
-        {PLAN.map((item, i) => (
-          <div key={i}>
-            <span className="text-sm font-semibold text-gray-900">{item.title}</span>
-            <div className={`text-xs font-semibold mt-0.5 mb-1 ${item.badgeColor}`}>{item.badge}</div>
-            <p className="text-sm text-gray-500 leading-relaxed">{item.desc}</p>
-          </div>
-        ))}
-      </div>
+  <div className="flex flex-col gap-4">
+    <h3 className="text-lg font-semibold text-gray-900">Your personalized course</h3>
+    <div className="grid grid-cols-3 gap-4">
+      {PLAN.map((item, i) => (
+        <div key={i} className="flex flex-col gap-2 p-4 border border-gray-200 rounded-2xl bg-white">
+          <span className="text-base font-semibold text-gray-900 leading-5">{item.title}</span>
+          <span className="inline-flex self-start px-2 py-0.5 rounded-full bg-gray-100 text-xs font-medium text-gray-600">{item.badge}</span>
+          <p className="text-sm text-gray-500 leading-5">{item.desc}</p>
+        </div>
+      ))}
     </div>
     {!disabled && (
-      <div className="px-5 pb-5 flex items-center gap-4">
+      <div className="flex items-center gap-4">
         <button
           onClick={onAccept}
           className="flex items-center gap-1.5 px-4 py-2 rounded-lg border border-indigo-600 text-indigo-600 text-sm font-medium hover:bg-indigo-50 transition-colors"
         >
-          Looks good <span>→</span>
+          Generate my learning path <span>→</span>
         </button>
-        <span className="text-sm text-gray-500">
-          Not quite right?{" "}
-          <button onClick={onAdjust} className="text-indigo-600 font-medium hover:underline">
-            Adjust plan
-          </button>
-        </span>
       </div>
     )}
   </div>
@@ -670,7 +659,7 @@ const TodaysPlanCard = ({ duration = "60min", hideStart = false, onStart }) => {
       <div className="relative bg-gradient-to-br from-slate-100 to-blue-50 px-6 py-6 flex items-center justify-between overflow-hidden" style={{minHeight: 160}}>
         <div className="z-10">
           <span className="inline-block text-xs font-semibold text-gray-500 bg-white/70 rounded-full px-2.5 py-0.5 mb-3">{duration}</span>
-          <h2 className="text-2xl font-bold text-gray-900 mb-4">Welcome! Your today's learning</h2>
+          <h2 className="text-2xl font-bold text-gray-900 mb-4">Welcome June, here's what you'll learn today</h2>
           {!hideStart && (
             <button onClick={onStart} className="bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-semibold px-5 py-2 rounded-lg transition-colors">
               Start
@@ -692,7 +681,7 @@ const TodaysPlanCard = ({ duration = "60min", hideStart = false, onStart }) => {
         </svg>
       </div>
 
-      {/* Skills you will learn */}
+      {/* What you will learn */}
       <div className="px-6 py-5">
         <div className="flex gap-3">
           <div className="mt-0.5 shrink-0 w-5 h-5 rounded-full bg-yellow-100 flex items-center justify-center">
@@ -705,9 +694,12 @@ const TodaysPlanCard = ({ duration = "60min", hideStart = false, onStart }) => {
             </svg>
           </div>
           <div>
-            <p className="text-xs font-semibold text-gray-400 uppercase tracking-wide mb-1">Skills you will learn</p>
-            <p className="text-sm font-semibold text-gray-900 mb-1">{content.skill}</p>
-            <p className="text-sm text-gray-700 leading-relaxed">{content.desc}</p>
+            <p className="text-xs font-semibold text-gray-400 uppercase tracking-wide mb-1">Topics you will learn</p>
+            <ul className="text-sm text-gray-700 leading-relaxed space-y-1 list-disc list-outside pl-4">
+              <li>Query with confidence — write SELECT statements with filters, conditions, and sorting to retrieve exactly the data you need.</li>
+              <li>Master SQL joins — combine data across multiple tables using INNER, LEFT, RIGHT, and FULL joins.</li>
+              <li>Write efficient, quality SQL — optimize performance, manage transactions, validate data, and apply best practices.</li>
+            </ul>
           </div>
         </div>
       </div>
@@ -1349,7 +1341,7 @@ const App = () => {
                         {!aiBannerDismissed && (
                           <div className="flex items-start gap-3 bg-gray-50 border border-gray-200 rounded-xl px-4 py-3.5 mb-6">
                             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" className="shrink-0 mt-0.5 text-indigo-500" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 3l1.88 5.76a1 1 0 0 0 .95.69h6.07l-4.91 3.57a1 1 0 0 0-.36 1.12L17.5 20l-4.91-3.57a1 1 0 0 0-1.18 0L6.5 20l1.88-5.86a1 1 0 0 0-.36-1.12L3.1 9.45h6.07a1 1 0 0 0 .95-.69L12 3z"/></svg>
-                            <p className="text-sm text-gray-700 leading-relaxed flex-1">Based on evaluation of your skills, we summarized key concepts from 4 readings to save you 24min time.</p>
+                            <p className="text-sm text-gray-700 leading-relaxed flex-1">Based on evaluation of your skills, we summarized key concepts from 4 readings.</p>
                             <button onClick={() => setAiBannerDismissed(true)} className="text-gray-400 hover:text-gray-600 shrink-0 mt-0.5 transition-colors">
                               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
                             </button>
@@ -1610,7 +1602,7 @@ const App = () => {
                       <div className="relative flex justify-end mt-6 pb-2">
                         {toastVisible && (
                           <div className="absolute bottom-full mb-3 right-0 bg-gray-900 text-white rounded-xl px-4 py-3 shadow-xl text-sm w-72">
-                            <div className="font-semibold mb-0.5">Item added to learning block</div>
+                            <div className="font-semibold mb-0.5">Added to today's learning block</div>
                             <div className="text-gray-300 text-xs">It will appear at the end of your learning block</div>
                           </div>
                         )}
@@ -1625,7 +1617,7 @@ const App = () => {
                           }}
                           className={`text-sm font-semibold border rounded-lg px-4 py-2 transition-colors tracking-wide ${addedToPlan ? "text-gray-400 border-gray-200 cursor-default" : "text-[#0056d2] border-[#0056d2] hover:bg-blue-50"}`}
                         >
-                          {addedToPlan ? "Added to learning plan" : "Add to learning plan"}
+                          {addedToPlan ? "Added to today's learning block" : "Add to my learning block"}
                         </button>
                       </div>
                     </div>
@@ -1646,29 +1638,26 @@ const App = () => {
 
               {/* Scrollable content */}
               <div ref={scrollRef} className="flex-1 overflow-y-auto z-10 relative">
-                <div className="max-w-2xl mx-auto px-6 pb-6" style={{ paddingTop: isOnboarding ? "11rem" : "2rem" }}>
+                <div className="mx-auto px-6 pb-6" style={{ maxWidth: "750px", paddingTop: isOnboarding ? "11rem" : "2rem" }}>
 
                   {/* Onboarding message */}
                   {isOnboarding && (
                     <div className="space-y-4">
                       <div>
                         <h2 className="text-xl font-bold text-gray-900 leading-snug mb-2">
-                          Let's build your expert-level learning path.
+                          Let's personalize what you'll learn in this course
                         </h2>
-                        <p className="text-sm text-gray-500 leading-relaxed">
-                          Tell us a bit about your background, and we'll prune the noise to save you hours of redundant Learning.
+                        <p className="text-sm text-gray-700 leading-relaxed">
+                          This course is built to teach the following skills
                         </p>
                       </div>
                       <div className="text-sm text-gray-700 leading-relaxed space-y-1">
-                        <p>This course is built around three major pillars:</p>
                         <p>[1] SQL Fundamentals</p>
                         <p>[2] Advanced Querying (like Joins &amp; CTEs)</p>
                         <p>[3] Data Engineering with GitHub.</p>
                       </div>
                       <p className="text-sm text-gray-700 leading-relaxed">
-                        To personalize your journey, how would you{" "}
-                        <strong className="font-semibold text-gray-900">describe your overall comfort level with these areas</strong>
-                        ?
+                        To help get started, tell us a bit about yourself and your overall comfort with these areas
                       </p>
                       <FeedbackRow />
                     </div>
