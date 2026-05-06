@@ -1,0 +1,16 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(node -e ' *)",
+      "Read(//Users/jchang/.claude/**)",
+      "Bash(python3 -c \"import json,sys; d=json.load\\(sys.stdin\\); print\\(json.dumps\\(d.get\\('mcpServers',{}\\), indent=2\\)\\)\")",
+      "Bash(cat \"/Users/jchang/Desktop/Claude Code/E2E Design/.claude/settings.json\" 2>/dev/null || cat \"/Users/jchang/Desktop/Claude Code/.claude/settings.json\" 2>/dev/null || echo \"not found\")",
+      "Read(//Users/jchang/Desktop/Claude Code/.claude/**)",
+      "WebFetch(domain:api.figma.com)",
+      "WebSearch",
+      "WebFetch(domain:help.figma.com)",
+      "WebFetch(domain:developers.figma.com)",
+      "mcp__figma__get_design_context"
+    ]
+  }
+}

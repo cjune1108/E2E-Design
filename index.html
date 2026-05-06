@@ -651,7 +651,7 @@ const PLAN_CONTENT = {
 };
 
 /* ── Today's Plan hero card ── */
-const TodaysPlanCard = ({ duration = "60min", hideStart = false, onStart }) => {
+const TodaysPlanCard = ({ duration = "60min", hideStart = false, onStart, isAdjusted = false }) => {
   const content = PLAN_CONTENT[duration] || PLAN_CONTENT["60min"];
   return (
     <div className="border border-gray-200 rounded-2xl overflow-hidden bg-white shadow-sm fade-in">
@@ -697,11 +697,19 @@ const TodaysPlanCard = ({ duration = "60min", hideStart = false, onStart }) => {
           </svg>
           <span className="text-xs text-gray-500">Topics you will learn</span>
         </div>
-        <ul className="space-y-2 text-sm text-gray-800 leading-6 list-disc list-outside pl-5">
-          <li>Query with confidence — write SELECT statements with filters, conditions, and sorting to retrieve exactly the data you need.</li>
-          <li>Master SQL joins — combine data across multiple tables using INNER, LEFT, RIGHT, and FULL joins.</li>
-          <li>Write efficient, quality SQL — optimize performance, manage transactions, validate data, and apply best practices.</li>
-        </ul>
+        {isAdjusted ? (
+          <ul className="space-y-2 text-sm text-gray-800 leading-6 list-disc list-outside pl-5">
+            <li>Filter and sort records — use WHERE, ORDER BY, and LIMIT to pull the exact rows you need.</li>
+            <li>Join tables confidently — practice INNER and LEFT JOINs across related datasets.</li>
+            <li>Aggregate your data — apply COUNT, SUM, AVG, and GROUP BY to summarize results.</li>
+          </ul>
+        ) : (
+          <ul className="space-y-2 text-sm text-gray-800 leading-6 list-disc list-outside pl-5">
+            <li>Query with confidence — write SELECT statements with filters, conditions, and sorting to retrieve exactly the data you need.</li>
+            <li>Master SQL joins — combine data across multiple tables using INNER, LEFT, RIGHT, and FULL joins.</li>
+            <li>Write efficient, quality SQL — optimize performance, manage transactions, validate data, and apply best practices.</li>
+          </ul>
+        )}
       </div>
     </div>
   );
@@ -1048,7 +1056,7 @@ const App = () => {
                         <p className="text-sm text-gray-700 leading-relaxed mb-3">{m.text}</p>
                         {m.planCard && (
                           <div className="mt-2">
-                            <TodaysPlanCard duration={m.planCard} onStart={handleStartVideo} />
+                            <TodaysPlanCard duration={m.planCard} onStart={handleStartVideo} isAdjusted={true} />
                           </div>
                         )}
                         {isLast && <FeedbackRow />}
