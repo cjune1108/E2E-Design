@@ -529,7 +529,7 @@ const PLAN = [
   },
   {
     title: "Data Engineering with GitHub",
-    badge: "Goal-aligned",
+    badge: "Fast-tracked",
     desc: "Your primary mission. I've injected more practices integration into the GitHub and Capstone modules.",
   },
 ];
@@ -619,7 +619,7 @@ const PLAN_CONTENT = {
     sidebarDesc: "SELECT queries and WHERE filtering",
     items: [
       { title: "Welcome to SQL for Data Science", type: "Video", done: false, duration: "7min" },
-      { title: "Github basics", type: "Reading", done: false, duration: "8min" },
+      { title: "Jupyter Notebook with SQL", type: "Reading", done: false, duration: "8min" },
       { title: "Python data practice", type: "Practice", done: false, duration: "15min" },
     ],
   },
@@ -641,7 +641,7 @@ const PLAN_CONTENT = {
     sidebarDesc: "Diving deeper into databases and Jupyter Notebooks",
     items: [
       { title: "Welcome to SQL for Data Science", type: "Video", done: false },
-      { title: "Github basics", type: "Reading", done: false },
+      { title: "Jupyter Notebook with SQL", type: "Reading", done: false },
       { title: "Python data practice", type: "Practice", done: false },
       { title: "SQL Basics", type: "Reading", done: false },
       { title: "Hello, SQL!", type: "Reading", done: false },
@@ -1427,12 +1427,12 @@ const App = () => {
                         {/* Reading content */}
                         <div className="space-y-6">
                           <div>
-                            <h2 className="text-lg font-bold text-gray-900 mb-3">What is GitHub and why does it matter for data work?</h2>
-                            <p className="text-sm text-gray-600 leading-relaxed">GitHub is a platform built on top of Git, a version control system that tracks changes to your code over time. For data scientists and analysts, GitHub serves as both a collaboration tool and a safety net — you can experiment freely knowing you can always roll back to a previous version. In a data engineering context, this is especially valuable when working on SQL scripts, pipeline configurations, or notebook files that multiple team members touch simultaneously. Think of it as a shared Google Doc, but with a full history of every edit ever made and the ability to run multiple versions in parallel.</p>
+                            <h2 className="text-lg font-bold text-gray-900 mb-3">What is Jupyter Notebook and why do data analysts use it?</h2>
+                            <p className="text-sm text-gray-600 leading-relaxed">Jupyter Notebook is an interactive coding environment that lets you write and run SQL (and Python) in the same place, alongside notes, charts, and results. For data analysts, it's one of the most practical tools available — you can query a database, see the output immediately, and document your reasoning all in one file. Unlike running SQL in a traditional client, Jupyter keeps your work visible and reproducible, making it easy to share your analysis with teammates or revisit it months later.</p>
                           </div>
                           <div>
-                            <h2 className="text-lg font-bold text-gray-900 mb-3">Core concepts: repositories, commits, and branches</h2>
-                            <p className="text-sm text-gray-600 leading-relaxed">A repository (or "repo") is the project folder that GitHub tracks. Every change you save is called a commit — a snapshot of your work at a specific point in time, with a message describing what you did. Branches let you work on a new feature or fix without touching the main codebase. Once your work is ready, you open a pull request to merge it back in, where teammates can review and leave comments before the changes go live. For data engineering projects, a typical workflow might involve a main branch holding production-ready SQL pipelines, and feature branches for iterating on new transformations or schema changes. Keeping your work in branches prevents half-finished changes from breaking the pipelines your team depends on every day.</p>
+                            <h2 className="text-lg font-bold text-gray-900 mb-3">Running SQL queries inside a Jupyter Notebook</h2>
+                            <p className="text-sm text-gray-600 leading-relaxed">To use SQL in Jupyter, you typically connect to a database using a library like <code>sqlite3</code>, <code>sqlalchemy</code>, or the <code>%%sql</code> magic command with the <code>ipython-sql</code> extension. Once connected, you can write SELECT statements directly in a cell and the results render as a formatted table below it. This means you can filter, join, and aggregate data just as you would in any SQL editor — but with the added ability to chain your queries into a full analysis workflow, visualize results with matplotlib or seaborn, and export your findings as a shareable notebook file.</p>
                           </div>
                         </div>
 
