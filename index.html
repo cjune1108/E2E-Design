@@ -1594,7 +1594,7 @@ const App = () => {
                       </p>
                     </div>
                   </div>
-                ) : item.type !== "Practice" ? (
+                ) : item.type === "Video" ? (
                   <div className="w-16 border-l border-gray-200 bg-white flex flex-col items-center py-4 gap-1 shrink-0">
                     {rightTools.map((t, i) => (
                       <button key={i} className={`flex flex-col items-center gap-1 py-3 px-2 rounded-lg w-full transition-colors ${t.active ? "text-indigo-600 font-semibold" : "text-gray-400 hover:text-gray-700"}`}>
