@@ -196,7 +196,7 @@ const PanelIcon = () => (
 );
 
 /* ── Sidebar ── */
-const Sidebar = ({ open, onToggle, courseMode, planDuration = "60min" }) => (
+const Sidebar = ({ open, onToggle, courseMode, planDuration = "60min", onItemClick }) => (
   <aside
     className="sidebar bg-white border-r border-gray-100 flex flex-col shrink-0 overflow-hidden"
     style={{ width: open ? 300 : 40 }}
@@ -233,28 +233,24 @@ const Sidebar = ({ open, onToggle, courseMode, planDuration = "60min" }) => (
           </button>
         </div>
 
-        {courseMode ? (
-          /* ── Course mode sidebar content ── */
+        {/* ── Sidebar content: always show course items ── */}
           <div className="flex-1 overflow-y-auto">
             {/* Today's plan mini card */}
             {(() => {
               const c = (typeof PLAN_CONTENT !== "undefined" && PLAN_CONTENT[planDuration]) || PLAN_CONTENT["60min"];
               return (
-                <div className="mx-3 mb-3 rounded-xl border border-gray-200 bg-gray-50 overflow-hidden">
-                  <div className="flex items-start justify-between px-3 pt-3 pb-3">
-                    <div className="flex-1">
-                      <div className="flex items-center gap-1.5 text-xs text-gray-500 mb-1">
-                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                          <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>
-                        </svg>
-                        <span>Today's learning</span>
-                        <span>•</span>
-                        <span>{planDuration}</span>
+                <div className="mx-3 mb-3 border border-gray-200 bg-gray-50 overflow-hidden" style={{ borderRadius: 4 }}>
+                  <div className="relative px-4 pt-2.5 pb-4">
+                    <div>
+                      <div className="flex items-center gap-1.5">
+                        <span className="text-sm font-semibold" style={{ color: '#0F1114' }}>Today's learning block</span>
+                        <span className="text-sm font-semibold" style={{ color: '#0F1114' }}>•</span>
+                        <span className="text-sm font-semibold" style={{ color: '#0F1114' }}>{(PLAN_CONTENT[planDuration] || PLAN_CONTENT["60min"]).displayDuration || planDuration.replace('min', ' min')}</span>
                       </div>
-                      <p className="text-xs text-gray-700 leading-snug">{c.sidebarDesc}</p>
+                      <p className="text-xs mt-1 leading-snug" style={{ color: '#0F1114', paddingRight: 50 }}>{c.sidebarDesc}</p>
                     </div>
-                    <div className="shrink-0 ml-2 mt-0.5 w-12">
-                      <IsometricIllustration />
+                    <div className="absolute right-2 top-1/2 -translate-y-1/2" style={{ width: 45, height: 45 }}>
+                      <img src="assets/learning-block-illustration.png" alt="" style={{ width: '100%', height: '100%', objectFit: 'contain' }} />
                     </div>
                   </div>
                 </div>
@@ -264,7 +260,7 @@ const Sidebar = ({ open, onToggle, courseMode, planDuration = "60min" }) => (
             {/* Course items list */}
             <div className="px-3 space-y-0.5">
               {(PLAN_CONTENT[planDuration] || PLAN_CONTENT["60min"]).items.map((item, i) => (
-                <div key={i} className="flex items-start gap-2.5 py-2.5 px-1 hover:bg-gray-50 rounded-lg cursor-pointer">
+                <div key={i} className="flex items-start gap-2.5 py-2.5 px-1 hover:bg-gray-50 rounded-lg cursor-pointer" onClick={() => onItemClick && onItemClick(item)}>
                   <div className="mt-0.5 shrink-0">
                     {item.done ? (
                       <div className="w-5 h-5 rounded-full bg-green-500 flex items-center justify-center">
@@ -298,15 +294,6 @@ const Sidebar = ({ open, onToggle, courseMode, planDuration = "60min" }) => (
               ))}
             </div>
           </div>
-        ) : (
-          /* ── Onboarding sidebar content ── */
-          <div className="flex-1 flex flex-col items-center justify-center px-6 pt-2 pb-16">
-            <IsometricIllustration />
-            <p className="text-xs text-gray-900 text-center leading-snug mt-5">
-              We would personalize your today's plan based on your skill level and time
-            </p>
-          </div>
-        )}
       </div>
     )}
   </aside>
@@ -564,7 +551,7 @@ const PLAN = [
   },
   {
     title: "Data Engineering with GitHub",
-    badge: "⚡ Fast-tracked",
+    badge: "🔍 Deep-Dive",
     desc: "Your primary mission. I've injected more practices integration into the GitHub and Capstone modules.",
   },
 ];
@@ -597,7 +584,7 @@ const PlanCard = ({ onAccept, onAdjust, disabled }) => (
         </button>
         <button onClick={onAdjust} className="hover:opacity-80 transition-opacity" style={{ fontSize: 14, lineHeight: '20px' }}>
           <span style={{ color: '#5B6780' }}>Not quite right? </span>
-          <span style={{ color: '#0056D2', fontWeight: 600 }}>Adjust plan</span>
+          <span style={{ color: '#0056D2', fontWeight: 600 }}>Adjust my plan</span>
         </button>
       </div>
     )}
@@ -646,6 +633,58 @@ const LoadingScreen = () => {
   );
 };
 
+/* ── Flashcard data ── */
+const FLASHCARDS = [
+  {
+    q: "What does the WHERE clause do in a SELECT statement?",
+    a: "WHERE filters rows before they are returned. Only rows that match the condition are included in the result.",
+  },
+  {
+    q: "What is the difference between WHERE and HAVING?",
+    a: "WHERE filters rows before grouping. HAVING filters groups after GROUP BY has been applied.",
+  },
+  {
+    q: "What does INNER JOIN return?",
+    a: "INNER JOIN returns only the rows where there is a matching value in both tables.",
+  },
+  {
+    q: "What does LEFT JOIN return that INNER JOIN doesn't?",
+    a: "LEFT JOIN returns all rows from the left table, even if there is no match in the right table. Non-matching rows get NULL for right table columns.",
+  },
+  {
+    q: "How does ORDER BY work with multiple columns?",
+    a: "Rows are sorted by the first column, then ties are broken by the second column, and so on. Each column can be ASC (default) or DESC.",
+  },
+  {
+    q: "What is the purpose of GROUP BY?",
+    a: "GROUP BY groups rows that share the same value in specified columns, allowing aggregate functions like COUNT, SUM, and AVG to be applied to each group.",
+  },
+  {
+    q: "When would you use a subquery instead of a JOIN?",
+    a: "Use a subquery when you need to filter based on an aggregated result, or when the logic is cleaner as a nested query. JOINs are generally faster for simple lookups.",
+  },
+  {
+    q: "What does COALESCE do?",
+    a: "COALESCE returns the first non-NULL value from its list of arguments. It's useful for replacing NULLs with a default value.",
+  },
+  {
+    q: "What is a CTE (Common Table Expression)?",
+    a: "A CTE is a temporary named result set defined with WITH. It makes complex queries easier to read and can be referenced multiple times in the same query.",
+  },
+  {
+    q: "What is the difference between COUNT(*) and COUNT(column)?",
+    a: "COUNT(*) counts all rows including NULLs. COUNT(column) counts only rows where that column is not NULL.",
+  },
+  {
+    q: "What does FULL OUTER JOIN return?",
+    a: "FULL OUTER JOIN returns all rows from both tables. Where there is no match, NULL is filled in for the missing side.",
+  },
+  {
+    q: "How do you remove duplicate rows from a query result?",
+    a: "Use SELECT DISTINCT to return only unique rows. You can also use GROUP BY without aggregates to deduplicate.",
+  },
+];
+
 /* ── Per-duration content ── */
 const PLAN_CONTENT = {
   "15min": {
@@ -691,6 +730,20 @@ const PLAN_CONTENT = {
       { title: "SQL Basics", type: "Reading", done: false },
       { title: "Hello, SQL!", type: "Reading", done: false },
       { title: "Knowledge Check: SQL Fundamentals", type: "Lab", done: false, duration: "30min" },
+    ],
+  },
+  "after-1-week": {
+    skill: "SQL querying and data analysis",
+    desc: "Based on where you left off, we're picking up with querying and joins — the skills that unlock real analytical power.",
+    sidebarDesc: "Using SQL to query and analyze data",
+    displayDuration: "45 min",
+    items: [
+      { title: "Writing SELECT queries", type: "Video", done: false },
+      { title: "Filtering with WHERE and ORDER BY", type: "Reading", done: false, aiGenerated: true },
+      { title: "Joining tables with INNER JOIN", type: "Practice", done: false, aiGenerated: true },
+      { title: "LEFT and RIGHT JOINs", type: "Reading", done: false },
+      { title: "Aggregation with GROUP BY", type: "Reading", done: false },
+      { title: "Advanced SQL: CTEs and Subqueries", type: "Lab", done: false, duration: "30min" },
     ],
   },
 };
@@ -823,16 +876,24 @@ const App = () => {
   const [stage, setStage] = useState("onboarding");
   const [qIndex, setQIndex] = useState(0);
   const [messages, setMessages] = useState([]);
-  const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [sidebarOpen, setSidebarOpen] = useState(true);
   const scrollRef = useRef(null);
 
   const handleSelectExperiment = (id) => {
     setExperiment(id);
+    if (id === "B") {
+      setStage("course");
+      setCourseStage("idle");
+      setCourseMessages([]);
+      setSidebarOpen(true);
+      setPlanDuration("after-1-week");
+      setRecapShown(false);
+    }
     if (id === "A") {
       setStage("onboarding");
       setMessages([]);
       setQIndex(0);
-      setSidebarOpen(false);
+      setSidebarOpen(true);
       setCourseMessages([]);
       setCourseStage("idle");
       setPlanDuration("60min");
@@ -1063,6 +1124,9 @@ const App = () => {
   const [extraItems, setExtraItems] = useState([]);
   const [fastTrackOpen, setFastTrackOpen] = useState(true);
   const [accordionOpen, setAccordionOpen] = useState({});
+  const [recapShown, setRecapShown] = useState(false);
+  const [flashcardIndex, setFlashcardIndex] = useState(0);
+  const [flashcardFlipped, setFlashcardFlipped] = useState(false);
 
   const TIME_OPTIONS = ["15min", "30min", "45min"];
 
@@ -1078,18 +1142,7 @@ const App = () => {
     setStage("video");
   };
 
-  if (experiment === "B") {
-    return (
-      <div style={{ position: "fixed", inset: 0, zIndex: 0 }}>
-        <ExperimentSwitcher current={experiment} onSelect={handleSelectExperiment} />
-        <iframe
-          src="./research-new/index.html"
-          style={{ width: "100%", height: "100%", border: "none", display: "block" }}
-          title="After 1 week"
-        />
-      </div>
-    );
-  }
+
 
   return (
     <div className="flex flex-col h-screen bg-gray-50 overflow-hidden">
@@ -1102,6 +1155,13 @@ const App = () => {
             onToggle={() => setSidebarOpen(o => !o)}
             courseMode={isCourse}
             planDuration={planDuration}
+            onItemClick={(item) => {
+              if (item.type === "Video") {
+                handleStartVideo();
+              } else {
+                setStage("course");
+              }
+            }}
           />
         )}
 
@@ -1123,10 +1183,12 @@ const App = () => {
                       fontWeight: 600, fontSize: 24, lineHeight: '28px', letterSpacing: '-0.005em',
                       background: 'linear-gradient(-55deg, #24DBE7 0%, #6923DE 86%)',
                       WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', backgroundClip: 'text',
-                    }}>Welcome back Sara!</h2>
+                    }}>{experiment === "B" ? "Welcome back Sara!" : "Welcome Sara!"}</h2>
 
                     <p style={{ fontSize: 16, lineHeight: '24px', color: '#0F1114' }}>
-                      Last time we covered the core SQL skills learners need for data science. Today we're going one step further: using those learning objectives to design an experience that actually matches where each learner is — not just teaching the same content, but adapting it to their level.
+                      {experiment === "B"
+                        ? "Last time we covered the core SQL skills learners need for data science. Today we're going one step further: using those learning objectives to design an experience that actually matches where each learner is — not just teaching the same content, but adapting it to their level."
+                        : "Welcome to your first session! We've put together a learning plan tailored to where you are right now — let's get started."}
                     </p>
 
                     <div style={{ border: '1px solid #DAE1ED', borderRadius: 16, overflow: 'hidden' }}>
@@ -1142,11 +1204,15 @@ const App = () => {
                         </div>
                       </div>
                       <div className="bg-white px-6 py-4" style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
-                        {[
+                        {(experiment === "B" ? [
+                          "Query with confidence — write SELECT statements with filters, conditions, and sorting to retrieve exactly the data you need.",
+                          "Master SQL joins — combine data across multiple tables using INNER, LEFT, RIGHT, and FULL joins.",
+                          "Write efficient, quality SQL — optimize performance, manage transactions, validate data, and apply practices.",
+                        ] : [
                           "Identify the purpose of the SELECT statement — the foundation of retrieving data from any",
                           "Write and filter queries using SELECT and WHERE — e.g. pulling specific records from a product catalog",
                           "Apply SQL in realistic scenarios — build confidence by solving practical, business-driven problems",
-                        ].map((item, i) => (
+                        ]).map((item, i) => (
                           <div key={i} className="flex items-start" style={{ gap: 12 }}>
                             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#0F1114" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="shrink-0" style={{ marginTop: 4 }}>
                               <path d="M5 12h14"/><path d="M12 5l7 7-7 7"/>
@@ -1158,7 +1224,7 @@ const App = () => {
                     </div>
 
                     <p style={{ fontSize: 16, lineHeight: '24px', color: '#0F1114' }}>
-                      Does this feel like the right place to pick up, or do you want to adjust
+                      Does this feel like the right place to pick up, or do you want to adjust?
                     </p>
                     <FeedbackRow noMargin />
                   </div>
@@ -1174,17 +1240,6 @@ const App = () => {
                           <div className="relative group max-w-sm">
                             <div className="bg-gray-100 text-gray-700 text-sm rounded-2xl rounded-tr-sm px-4 py-2.5 leading-relaxed">
                               {m.text}
-                            </div>
-                            <div className="absolute -bottom-5 right-0 flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
-                              <button className="w-6 h-6 flex items-center justify-center rounded text-gray-400 hover:text-gray-600">
-                                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
-                                  <rect x="9" y="9" width="13" height="13" rx="2"/>
-                                  <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/>
-                                </svg>
-                              </button>
-                              <button className="w-6 h-6 flex items-center justify-center rounded text-gray-400 hover:text-gray-600">
-                                <EditIcon />
-                              </button>
                             </div>
                           </div>
                         </div>
@@ -1203,47 +1258,82 @@ const App = () => {
                       </div>
                     );
                   })}
+
+                  {/* Recap: user bubble + flashcard in scroll area */}
+                  {recapShown && (
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+                      <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
+                        <div style={{ background: '#F0F6FF', borderRadius: '8px 8px 0px 8px', padding: '8px 12px', fontSize: 16, lineHeight: '24px', color: '#1E2229' }}>
+                          Recap what I learn
+                        </div>
+                      </div>
+                      <div style={{ border: '1px solid #DAE1ED', borderRadius: 12, minHeight: 246, position: 'relative', background: flashcardFlipped ? '#F2F5FA' : '#FFFFFF', overflow: 'hidden', display: 'flex', flexDirection: 'column' }}>
+                        {/* Header */}
+                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '18px 32px 0' }}>
+                          <span style={{ fontWeight: 600, fontSize: 16, lineHeight: '20px', color: '#000000' }}>
+                            {flashcardFlipped ? 'Answer' : 'Quick refresher'}
+                          </span>
+                          <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                            <button onClick={() => { setFlashcardIndex(i => Math.max(0, i - 1)); setFlashcardFlipped(false); }} style={{ width: 36, height: 36, display: 'flex', alignItems: 'center', justifyContent: 'center', borderRadius: 4, border: '1px solid #DAE1ED', background: '#FFFFFF', cursor: 'pointer' }}>
+                              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#5B6780" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
+                            </button>
+                            <span style={{ fontWeight: 600, fontSize: 16, color: '#5B6780' }}>{flashcardIndex + 1}/{FLASHCARDS.length}</span>
+                            <button onClick={() => { setFlashcardIndex(i => Math.min(FLASHCARDS.length - 1, i + 1)); setFlashcardFlipped(false); }} style={{ width: 36, height: 36, display: 'flex', alignItems: 'center', justifyContent: 'center', borderRadius: 4, border: '1px solid #DAE1ED', background: '#FFFFFF', cursor: 'pointer' }}>
+                              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#5B6780" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
+                            </button>
+                          </div>
+                        </div>
+                        {/* Content */}
+                        <div style={{ flex: 1, display: 'flex', flexDirection: 'column', justifyContent: 'center', padding: '20px 32px', minHeight: 140 }}>
+                          <p style={{ fontWeight: 600, fontSize: 20, lineHeight: '24px', color: '#0F1114', letterSpacing: '-0.003em' }}>
+                            {flashcardFlipped ? FLASHCARDS[flashcardIndex].a : FLASHCARDS[flashcardIndex].q}
+                          </p>
+                        </div>
+                        {/* Flip button */}
+                        <div style={{ display: 'flex', justifyContent: 'center', paddingBottom: 24 }}>
+                          <button onClick={() => setFlashcardFlipped(f => !f)} style={{ fontWeight: 600, fontSize: 16, lineHeight: '20px', color: '#0056D2', background: 'none', border: 'none', cursor: 'pointer' }}>
+                            {flashcardFlipped ? 'Show Question' : 'Click to Flip'}
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+                  )}
+
                 </div>
               </div>
 
-              {/* Course bottom bar */}
+              {/* Course bottom bar — fixed, always at bottom */}
               <div className="z-10 px-6 pb-5 pt-2 bg-white border-t border-gray-100">
                 <div className="max-w-2xl mx-auto space-y-2.5">
-
-                  {/* Time picker card */}
                   {courseStage === "time-pick" && (
                     <div className="border border-gray-200 rounded-2xl overflow-hidden bg-white shadow-sm">
                       {TIME_OPTIONS.map((opt, i) => (
-                        <button
-                          key={i}
-                          onClick={() => handleTimePick(opt)}
-                          className="w-full flex items-center gap-3 px-4 py-3.5 text-left hover:bg-gray-50 transition-colors border-b border-gray-100 last:border-b-0 group"
-                        >
-                          <span className="w-5 h-5 rounded-full border border-gray-300 group-hover:border-indigo-400 flex items-center justify-center shrink-0 text-xs text-gray-400 group-hover:text-indigo-500 font-medium transition-colors">
-                            {i + 1}
-                          </span>
+                        <button key={i} onClick={() => handleTimePick(opt)}
+                          className="w-full flex items-center gap-3 px-4 py-3.5 text-left hover:bg-gray-50 transition-colors border-b border-gray-100 last:border-b-0 group">
+                          <span className="w-5 h-5 rounded-full border border-gray-300 group-hover:border-indigo-400 flex items-center justify-center shrink-0 text-xs text-gray-400 group-hover:text-indigo-500 font-medium transition-colors">{i + 1}</span>
                           <span className="text-sm text-gray-700">{opt}</span>
                         </button>
                       ))}
                     </div>
                   )}
-
-                  {/* Quick action buttons — only when idle and no time adjustment made */}
                   {courseStage !== "thinking" && courseStage !== "time-pick" && (
                     <div className="flex items-center flex-wrap" style={{ gap: 8 }}>
-                      <button
-                        onClick={handleStartVideo}
-                        className="hover:opacity-90 transition-opacity"
-                        style={{ background: '#0056D2', color: 'white', padding: '6px 24px', borderRadius: 8, fontWeight: 600, fontSize: 14, lineHeight: '20px', letterSpacing: '0.01em' }}
-                      >
+                      <button onClick={handleStartVideo} className="hover:opacity-90 transition-opacity"
+                        style={{ background: '#0056D2', color: 'white', padding: '6px 24px', borderRadius: 8, fontWeight: 600, fontSize: 14, lineHeight: '20px', letterSpacing: '0.01em' }}>
                         Let's go
                       </button>
+                      {!recapShown && (
+                        <button onClick={() => { setRecapShown(true); setFlashcardIndex(0); }}
+                          className="hover:opacity-80 transition-opacity"
+                          style={{ background: '#FFFFFF', color: '#0F1114', padding: '6px 12px', borderRadius: 8, fontSize: 14, lineHeight: '20px', border: '1px solid #DAE1ED' }}>
+                          Recap what I learn
+                        </button>
+                      )}
                     </div>
                   )}
-
                   <ChatInput
                     onSend={handleCourseSend}
-                    placeholder={courseStage === "idle" ? "Ask me anything" : "Answer in my own words"}
+                    placeholder={courseStage === "idle" ? "Adjust my plan" : "Answer in my own words"}
                   />
                 </div>
               </div>
@@ -1268,26 +1358,32 @@ const App = () => {
                 {/* Left panel — course item list */}
                 <div className="w-72 border-r border-gray-200 flex flex-col overflow-hidden bg-white shrink-0">
                   {/* Course title */}
-                  <div className="px-4 pt-4 pb-3 border-b border-gray-100">
-                    <p className="text-xs font-semibold text-gray-900 leading-snug mb-1">SQL for Data Science (and Version Control with GitHub)</p>
-                    <button className="text-xs text-indigo-600 font-medium hover:underline">Course progress</button>
+                  <div className="flex items-start justify-between px-4 pt-4 pb-2 shrink-0">
+                    <div className="flex-1 pr-2">
+                      <p className="text-sm font-semibold text-gray-900 leading-snug">SQL for Data Science (and Version Control with GitHub)</p>
+                      <button className="text-xs text-indigo-600 hover:underline mt-1 inline-block">Course progress</button>
+                    </div>
+                    <button className="w-7 h-7 flex items-center justify-center rounded hover:bg-gray-100 text-gray-400 transition-colors shrink-0 mt-0.5">
+                      <PanelIcon />
+                    </button>
                   </div>
                   {/* Today's mini card */}
                   {(() => {
                     const c = PLAN_CONTENT[planDuration] || PLAN_CONTENT["60min"];
                     return (
-                      <div className="mx-3 mt-3 mb-2 rounded-xl border border-gray-200 bg-gray-50 overflow-hidden">
-                        <div className="flex items-start justify-between px-3 pt-3 pb-3">
-                          <div className="flex-1">
-                            <div className="flex items-center gap-1.5 text-xs text-gray-500 mb-1">
-                              <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
-                              <span>Today's learning</span>
-                              <span>•</span>
-                              <span>{planDuration}</span>
+                      <div className="mx-3 mb-3 border border-gray-200 bg-gray-50 overflow-hidden" style={{ borderRadius: 4 }}>
+                        <div className="relative px-4 pt-2.5 pb-4">
+                          <div>
+                            <div className="flex items-center gap-1.5">
+                              <span className="text-sm font-semibold" style={{ color: '#0F1114' }}>Today's learning block</span>
+                              <span className="text-sm font-semibold" style={{ color: '#0F1114' }}>•</span>
+                              <span className="text-sm font-semibold" style={{ color: '#0F1114' }}>{(PLAN_CONTENT[planDuration] || PLAN_CONTENT["60min"]).displayDuration || planDuration.replace('min', ' min')}</span>
                             </div>
-                            <p className="text-xs text-gray-700 leading-snug">{c.sidebarDesc}</p>
+                            <p className="text-xs mt-1 leading-snug" style={{ color: '#0F1114', paddingRight: 50 }}>{c.sidebarDesc}</p>
                           </div>
-                          <div className="shrink-0 ml-2 w-10"><IsometricIllustration /></div>
+                          <div className="absolute right-2 top-1/2 -translate-y-1/2" style={{ width: 45, height: 45 }}>
+                            <img src="assets/learning-block-illustration.png" alt="" style={{ width: '100%', height: '100%', objectFit: 'contain' }} />
+                          </div>
                         </div>
                       </div>
                     );
@@ -1919,10 +2015,6 @@ const App = () => {
           {/* Onboarding + conversation view */}
           {!isLoading && !isCourse && !isVideo && (
             <>
-              {/* Top gradient — only on onboarding */}
-              {isOnboarding && (
-                <div className="top-gradient absolute inset-x-0 top-0 h-56 pointer-events-none z-0" />
-              )}
 
               {/* Scrollable content */}
               <div ref={scrollRef} className="flex-1 overflow-y-auto z-10 relative">
