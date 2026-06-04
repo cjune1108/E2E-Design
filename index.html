@@ -541,50 +541,65 @@ const CoursePlanCard = ({ title, duration, items }) => (
 const PLAN = [
   {
     title: "SQL Fundamentals",
-    badge: "⚡ Fast-tracked",
-    desc: "Since you know the basics, I've cleared the introductory noise. We'll start with Optimized Join Generation to jump straight into action.",
+    badge: "Fast-tracked",
+    badgeStyle: { background: '#FEF3C7', color: '#92400E' },
+    badgeIcon: "⚡",
+    desc: "You've already got the foundations — I've cleared the introductory material so we can focus on what will actually level you up.",
   },
   {
-    title: "Advanced Querying (like Joins & CTEs)",
-    badge: "🔍 Deep-Dive",
-    desc: "Since you know the basics, I've cleared the introductory noise. We'll start with Optimized Join Generation to jump straight into action.",
+    title: "Advanced Querying (Joins & CTEs)",
+    badge: "Deep-dive",
+    badgeStyle: { background: '#EFF6FF', color: '#1D4ED8' },
+    badgeIcon: "🔍",
+    desc: "Your stated gap. I've added extra practice sets to the JOIN and CTE sections so you build real fluency.",
   },
   {
     title: "Data Engineering with GitHub",
-    badge: "🔍 Deep-Dive",
-    desc: "Your primary mission. I've injected more practices integration into the GitHub and Capstone modules.",
+    badge: "Deep-dive",
+    badgeStyle: { background: '#EFF6FF', color: '#1D4ED8' },
+    badgeIcon: "🔍",
+    desc: "Your primary goal. GitHub workflows and the Capstone are weighted more heavily than the standard track.",
   },
 ];
 
 const PlanCard = ({ onAccept, onAdjust, disabled }) => (
-  <div className="flex flex-col gap-6 bg-white" style={{ border: '1px solid #DAE1ED', borderRadius: 16, padding: '32px 26px' }}>
-    <h3 style={{ fontWeight: 600, fontSize: 20, lineHeight: '24px', color: '#000000', letterSpacing: '-0.3%' }}>
-      Your personalized learning plan
-    </h3>
-    <div className="flex flex-col" style={{ gap: 20 }}>
+  <div className="flex flex-col bg-white" style={{ border: '1px solid #DAE1ED', borderRadius: 16, padding: '24px', gap: 20 }}>
+    <div>
+      <h3 style={{ fontWeight: 700, fontSize: 18, lineHeight: '24px', color: '#0F1114', marginBottom: 2 }}>
+        Your personalized learning plan
+      </h3>
+      <p style={{ fontSize: 13, color: '#5B6780' }}>Tailored based on your answers</p>
+    </div>
+    <div className="flex flex-col" style={{ gap: 16 }}>
       {PLAN.map((item, i) => (
-        <div key={i} className="flex flex-col" style={{ gap: 4 }}>
-          <span style={{ fontWeight: 600, fontSize: 16, lineHeight: '20px', color: '#101828' }}>{item.title}</span>
-          <span style={{ fontWeight: 600, fontSize: 14, lineHeight: '18px', color: '#000000' }}>{item.badge}</span>
-          <p style={{ fontWeight: 400, fontSize: 14, lineHeight: '20px', color: '#4A5565' }}>{item.desc}</p>
+        <div key={i}>
+          {i > 0 && <div style={{ borderTop: '1px solid #F0F3F8', marginBottom: 16 }} />}
+          <div className="flex flex-col" style={{ gap: 6 }}>
+            <div className="flex items-center" style={{ gap: 8 }}>
+              <span style={{ fontWeight: 600, fontSize: 15, lineHeight: '20px', color: '#0F1114' }}>{item.title}</span>
+              <span style={{ fontSize: 12, fontWeight: 600, lineHeight: '16px', padding: '2px 8px', borderRadius: 99, ...item.badgeStyle }}>
+                {item.badgeIcon} {item.badge}
+              </span>
+            </div>
+            <p style={{ fontWeight: 400, fontSize: 13, lineHeight: '20px', color: '#5B6780' }}>{item.desc}</p>
+          </div>
         </div>
       ))}
     </div>
     {!disabled && (
-      <div className="flex items-center" style={{ gap: 24 }}>
+      <div className="flex items-center" style={{ gap: 16, paddingTop: 4 }}>
         <button
           onClick={onAccept}
-          className="flex items-center gap-1 hover:bg-blue-50 transition-colors"
-          style={{ border: '1px solid #0056D2', borderRadius: 8, padding: '8px 16px', color: '#0056D2', fontWeight: 600, fontSize: 14, lineHeight: '20px', letterSpacing: '0.01em' }}
+          className="flex items-center gap-1 hover:bg-blue-700 transition-colors"
+          style={{ background: '#0056D2', borderRadius: 8, padding: '8px 16px', color: '#FFFFFF', fontWeight: 600, fontSize: 14, lineHeight: '20px', border: 'none' }}
         >
           Looks good
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
             <path d="M5 12h14"/><path d="M12 5l7 7-7 7"/>
           </svg>
         </button>
-        <button onClick={onAdjust} className="hover:opacity-80 transition-opacity" style={{ fontSize: 14, lineHeight: '20px' }}>
-          <span style={{ color: '#5B6780' }}>Not quite right? </span>
-          <span style={{ color: '#0056D2', fontWeight: 600 }}>Adjust my plan</span>
+        <button onClick={onAdjust} className="hover:opacity-70 transition-opacity" style={{ fontSize: 14, lineHeight: '20px', color: '#0056D2', fontWeight: 500, background: 'none', border: 'none', cursor: 'pointer', padding: 0 }}>
+          Tweak my plan
         </button>
       </div>
     )}
@@ -1122,7 +1137,7 @@ const App = () => {
   const [addedToPlan, setAddedToPlan] = useState(false);
   const [toastVisible, setToastVisible] = useState(false);
   const [extraItems, setExtraItems] = useState([]);
-  const [fastTrackOpen, setFastTrackOpen] = useState(true);
+  const [fastTrackOpen, setFastTrackOpen] = useState(false);
   const [accordionOpen, setAccordionOpen] = useState({});
   const [recapShown, setRecapShown] = useState(false);
   const [flashcardIndex, setFlashcardIndex] = useState(0);
@@ -1180,10 +1195,8 @@ const App = () => {
                   {/* Course welcome content */}
                   <div className="flex flex-col" style={{ gap: 20 }}>
                     <h2 style={{
-                      fontWeight: 600, fontSize: 24, lineHeight: '28px', letterSpacing: '-0.005em',
-                      background: 'linear-gradient(-55deg, #24DBE7 0%, #6923DE 86%)',
-                      WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', backgroundClip: 'text',
-                    }}>{experiment === "B" ? "Welcome back Sara!" : "Welcome Sara!"}</h2>
+                      fontWeight: 700, fontSize: 24, lineHeight: '28px', color: '#111827',
+                    }}>{experiment === "B" ? "Welcome back Bill!" : "Welcome Bill!"}</h2>
 
                     <p style={{ fontSize: 16, lineHeight: '24px', color: '#0F1114' }}>
                       {experiment === "B"
@@ -1322,7 +1335,7 @@ const App = () => {
                         style={{ background: '#0056D2', color: 'white', padding: '6px 24px', borderRadius: 8, fontWeight: 600, fontSize: 14, lineHeight: '20px', letterSpacing: '0.01em' }}>
                         Let's go
                       </button>
-                      {!recapShown && (
+                      {!recapShown && experiment === "B" && (
                         <button onClick={() => { setRecapShown(true); setFlashcardIndex(0); }}
                           className="hover:opacity-80 transition-opacity"
                           style={{ background: '#FFFFFF', color: '#0F1114', padding: '6px 12px', borderRadius: 8, fontSize: 14, lineHeight: '20px', border: '1px solid #DAE1ED' }}>
@@ -1708,15 +1721,16 @@ const App = () => {
 
                             {/* Fast track banner — only for Jupyter Notebook with SQL */}
                             {item.title === "Jupyter Notebook with SQL" && (
-                              <div className="mb-6 rounded-xl overflow-hidden" style={{ background: '#F0F6FF' }}>
+                              <div className="mb-6" style={{ border: '1px solid #DAE1ED', borderRadius: 16, overflow: 'hidden', background: '#F0F6FF' }}>
                                 {/* Header row */}
                                 <button
                                   onClick={() => setFastTrackOpen(o => !o)}
-                                  className="w-full flex items-center gap-2 px-4 py-4 text-left"
+                                  className="w-full flex items-center gap-2 text-left"
+                                  style={{ padding: '16px 16px', background: 'transparent' }}
                                 >
-                                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+                                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" style={{ flexShrink: 0 }}>
                                     <defs>
-                                      <linearGradient id="ftSparkle" x1="0" y1="0" x2="1" y2="1">
+                                      <linearGradient id="ftSparkle" x1="0" y1="1" x2="1" y2="0">
                                         <stop offset="0%" stopColor="#0048B0"/>
                                         <stop offset="100%" stopColor="#1E72EB"/>
                                       </linearGradient>
@@ -1724,12 +1738,42 @@ const App = () => {
                                     <path d="M11 3C11 3 10.1 9.2 7 11C3.9 12.8 1 12.5 1 12.5C1 12.5 3.9 12.2 7 14C10.1 15.8 11 22 11 22C11 22 11.9 15.8 15 14C18.1 12.2 21 12.5 21 12.5C21 12.5 18.1 12.8 15 11C11.9 9.2 11 3 11 3Z" fill="url(#ftSparkle)"/>
                                     <circle cx="20" cy="4" r="2.5" fill="url(#ftSparkle)"/>
                                   </svg>
-                                  <span className="flex-1 text-sm" style={{ color: '#0F1114' }}>
-                                    <span style={{ fontWeight: 600 }}>Fast track</span>
-                                    <span style={{ fontWeight: 400 }}>: You've seen this before — here's what to keep in mind before you practice.</span>
+                                  <span className="flex-1" style={{ fontFamily: 'Source Sans 3, sans-serif', fontSize: 16, lineHeight: '20px', color: '#0F1114', letterSpacing: '-0.003em' }}>
+                                    <span style={{ fontWeight: 600 }}>Fast track:</span>
+                                    <span style={{ fontWeight: 400 }}>  You've seen this before — here's what to keep in mind.</span>
                                   </span>
+                                  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#5B6780" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"
+                                    style={{ flexShrink: 0, transform: fastTrackOpen ? 'rotate(180deg)' : 'none', transition: 'transform 0.2s' }}>
+                                    <polyline points="6 9 12 15 18 9"/>
+                                  </svg>
                                 </button>
 
+                                {/* Expanded content */}
+                                {fastTrackOpen && (
+                                  <div style={{ padding: '0 16px 16px', display: 'flex', flexDirection: 'column', gap: 8 }}>
+                                    <div style={{ borderTop: '1px solid #DAE1ED', marginBottom: 8 }} />
+                                    {[
+                                      { title: "Introduction to Jupyter Notebooks", type: "Video" },
+                                      { title: "Connecting SQL to Python environments", type: "Video" },
+                                    ].map((reviewItem, ri) => (
+                                      <div key={ri} style={{ background: '#FFFFFF', border: '1px solid #E5EEF1', borderRadius: 8, padding: 12, display: 'flex', alignItems: 'center', gap: 12 }}>
+                                        {/* Thumbnail */}
+                                        <div style={{ width: 72, height: 48, borderRadius: 8, background: '#F1E8FF', flexShrink: 0, overflow: 'hidden' }}>
+                                          <img src="assets/fast-track-thumbnail.png" alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                                        </div>
+                                        {/* Text */}
+                                        <div style={{ flex: 1, minWidth: 0 }}>
+                                          <p style={{ fontFamily: 'Source Sans 3, sans-serif', fontSize: 16, lineHeight: '24px', color: '#0F1114', fontWeight: 400 }}>{reviewItem.title}</p>
+                                          <p style={{ fontFamily: 'Source Sans 3, sans-serif', fontSize: 14, lineHeight: '20px', color: '#636363' }}>{reviewItem.type}</p>
+                                        </div>
+                                        {/* Review button */}
+                                        <button style={{ flexShrink: 0, padding: '8px 16px', borderRadius: 8, border: '1px solid #0056D2', background: '#FFFFFF', color: '#0056D2', fontFamily: 'Source Sans 3, sans-serif', fontWeight: 600, fontSize: 14, lineHeight: '20px', cursor: 'pointer' }}>
+                                          Review
+                                        </button>
+                                      </div>
+                                    ))}
+                                  </div>
+                                )}
                               </div>
                             )}
 
